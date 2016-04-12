@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
+  <CommandSet xml:lang="en-us" Name="VirtualFridgeCommandSet_en-us">
+    <AppName> VirtualFridge </AppName>
+    <Example> Add note to VirtualFridge </Example>
+
+    <Command Name="addNewNote">
+      <Example> Add note to VirtualFridge </Example>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> add [new] note [to] </ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified"> add [new] {builtin:AppName} note</ListenFor>
+      <Feedback> Opening VirtualFridge to add note </Feedback>
+      <Navigate/>
+    </Command>
+    <Command Name="addNewNoteForPerson">
+      <Example> Add note for Brian to VirtualFridge </Example>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> add [new] note for {person} [to] </ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> add [new] note to {person} [to] </ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified"> add [new] {builtin:AppName} note for {person}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified"> add [new] {builtin:AppName} note to {person}</ListenFor>
+      <Feedback> Opening VirtualFridge to add note for {person} </Feedback>
+      <Navigate/>
+    </Command>
+    <Command Name="showMyNotes">
+      <Example> Show my VirtualFridge notes </Example>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase"> show [my] notes [from] </ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified"> show [my] {builtin:AppName} notes </ListenFor>
+      <Feedback> Here are your VirtualFridge notes </Feedback>
+      <VoiceCommandService Target="VirtualFridgeVoiceCommandService"/>
+    </Command>
+    <!-- Everyone is app default. Dynamically build this list on first launch and for in-app updates. -->
+    <PhraseList Label="person">
+      <Item>Everyone</Item>
+    </PhraseList>
+  </CommandSet>
+</VoiceCommands>

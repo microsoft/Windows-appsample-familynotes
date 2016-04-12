@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualFridge", "VirtualFridge\VirtualFridge.csproj", "{5096B783-EB4A-409A-922A-7C70826B0B83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7DE360D1-4012-4BC6-84C1-102D5ACF7DD8}"
+	ProjectSection(SolutionItems) = preProject
+		CameraImagingRecognition.md = CameraImagingRecognition.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		DatabindInkCanvas.md = DatabindInkCanvas.md
+		LICENSE = LICENSE
+		README.md = README.md
+		Serialization.md = Serialization.md
+		Speech.md = Speech.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Debug|x64.ActiveCfg = Debug|x64
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Debug|x64.Build.0 = Debug|x64
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Debug|x64.Deploy.0 = Debug|x64
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Debug|x86.ActiveCfg = Debug|x86
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Debug|x86.Build.0 = Debug|x86
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Debug|x86.Deploy.0 = Debug|x86
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Release|x64.ActiveCfg = Release|x64
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Release|x64.Build.0 = Release|x64
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Release|x64.Deploy.0 = Release|x64
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Release|x86.ActiveCfg = Release|x86
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Release|x86.Build.0 = Release|x86
+		{5096B783-EB4A-409A-922A-7C70826B0B83}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

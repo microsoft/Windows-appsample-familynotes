@@ -1,0 +1,84 @@
+﻿<!--
+Copyright (c) Microsoft Corporation.  All rights reserved.
+The MIT License (MIT)
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+    <UserControl
+    x:Class="VirtualFridge.Note"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VirtualFridge"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converter="using:VirtualFridge.Converters"
+    x:Name="NoteRoot"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400" Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <converter:InputModeConverter x:Key="InputModeConverter" />
+    </UserControl.Resources>
+
+    <Grid x:Name ="TheNote" Background="#FFC1C6E2" Height="300" Width="400" CornerRadius="8">
+
+        <Border x:Name="DropShadow" Width="400" Height="300" Opacity="0.3" RenderTransformOrigin="0,0" BorderThickness="1,1,8,8" BorderBrush="Black" CornerRadius="8"   >
+            <Border.RenderTransform>
+                <CompositeTransform ScaleX="1.02" ScaleY="1.02"  />
+            </Border.RenderTransform>
+        </Border>
+
+        <Grid x:Name="NoteTopSection">
+            <TextBlock x:Name="noteTitle" HorizontalAlignment="Center" Margin="48,7,88,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="264" Height="29" Text="{x:Bind DisplayName}" Foreground="Black" FontSize="18.667" FontWeight="Bold"/>
+
+            <Button x:Name="buttonClose"  Content="&#xE107;"   HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Click="ButtonClose_Click" FontFamily="Segoe UI Symbol" FontSize="18.667" RenderTransformOrigin="0,0" Height="36" >
+                <Button.Background>
+                    <LinearGradientBrush EndPoint="1.1,1.0" StartPoint="0.0,0.0">
+                        <GradientStop Color="#FFE5B5FB" Offset="1"/>
+                        <GradientStop Color="#FF8999F3" Offset="0.187"/>
+                        <GradientStop Color="#FF8999F3" Offset="0.087"/>
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+        </Grid>
+        <Grid x:Name="NoteBottomSection" >
+
+            <StackPanel Width="380" Height="32" Orientation="Horizontal" VerticalAlignment="Bottom" CornerRadius="4" Margin="10,0,10,10" HorizontalAlignment="Stretch">
+                <Button x:Name="NoteTypeText" Content="Text" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" Width="126" Click="NoteTypeText_Click" Foreground="White" Background="#FFAAA4A4" IsEnabled="{Binding ElementName=NoteRoot, Path=CanEnterTypingMode}" />
+                <Button x:Name="NoteTypeInk" Content="Ink" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Width="126" Height="32" Click="NoteTypeInk_Click" Foreground="White" IsEnabled="{Binding ElementName=NoteRoot, Path=CanEnterInkMode}" Background="#FFAAA4A4" BorderBrush="#7F545050" BorderThickness="1,0" />
+                <Button x:Name="NoteTypeVoice" Content="Dictate" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Width="126" Height="32" Click="NoteTypeVoice_Click"  Foreground="White" Background="#FFAAA4A4" IsEnabled="{Binding ElementName=NoteRoot, Path=CanEnterSpeechMode}"  />
+            </StackPanel>
+            <TextBox x:Name="containerForText" HorizontalAlignment="Left" Margin="10,52 ,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="199" Width="380" PlaceholderText="{Binding Path=NotePlaceholderText, Mode=TwoWay}"  
+                     GotFocus="ContainerForText_GotFocus" TextChanged="ContainerForText_TextChanged" Text="{Binding Path=NoteText, Mode=TwoWay}" Foreground="Black" SelectionHighlightColor="#FF6588A4" FontSize="21.333" BorderThickness="0" 
+                     Visibility="{x:Bind InputMode, Converter={StaticResource InputModeConverter}, ConverterParameter=Text, Mode=OneWay}" AcceptsReturn="True">
+                <TextBox.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FFFFAEFF" Offset="0.993"/>
+                        <GradientStop Color="#FF9EB4F0" Offset="0.387"/>
+                    </LinearGradientBrush>
+                </TextBox.Background>
+            </TextBox>
+            <local:BindableInkCanvas x:Name="containerForInk" 
+                Strokes="{Binding Path=Ink, Mode=TwoWay}" 
+                HorizontalAlignment="Left" Height="199" Margin="10,58,0,0" VerticalAlignment="Top" Width="380" 
+                Visibility="{x:Bind InputMode, Converter={StaticResource InputModeConverter}, ConverterParameter=Ink, Mode=OneWay}"/>
+        </Grid>
+      
+    </Grid>
+
+
+</UserControl>

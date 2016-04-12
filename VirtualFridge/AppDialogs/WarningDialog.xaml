@@ -1,0 +1,19 @@
+﻿<ContentDialog
+    x:Class="VirtualFridge.AppDialogs.WarningDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VirtualFridge.AppDialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Privacy Warning"
+    PrimaryButtonText="Accept"
+    SecondaryButtonText="Do not accept"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+
+    <Grid>
+        <TextBlock Margin="0,20,10,0" TextWrapping="WrapWholeWords" FontWeight="ExtraBlack">
+            Please note: When the facial recognition feature is enabled, the Microsoft Cognitive Services Face APIs are used and images will be automatically transmitted to Microsoft for processing. Microsoft will receive the images and other data that’s uploaded and may use them for service improvement purposes. Please click Accept only if you, and everyone whose image may be captured, agree with this usage. For more information about Microsoft privacy policies, see https://privacy.microsoft.com/privacystatement.</TextBlock>
+    </Grid>
+</ContentDialog>
