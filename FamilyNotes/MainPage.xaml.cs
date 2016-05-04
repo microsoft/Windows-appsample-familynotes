@@ -204,7 +204,7 @@ namespace FamilyNotes
         /// Display a friendly greeting at the top of the screen.
         /// </summary>
         /// <param name="name">Name of user for the salutation</param>
-        private void UpdateGreeting(string name)
+        private async void UpdateGreeting(string name)
         {
             var now = DateTime.Now;
             var greeting =
@@ -213,6 +213,11 @@ namespace FamilyNotes
                 /* otherwise */ "Good night";
             var person = string.IsNullOrEmpty(name) ? "!" : $", {name}!";
             TextGreeting.Text = $"{greeting}{person}";
+
+            if (_speechManager != null && !string.IsNullOrEmpty(name))
+            {
+                await _speechManager.SpeakAsync(TextGreeting.Text, _media);
+            }
         }
 
 
@@ -228,9 +233,9 @@ namespace FamilyNotes
             return focusedNote;
         }
 
-        private void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
+        private async void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
         {
-            this.Public_ShowNotesForPerson(e.User);
+            Public_ShowNotesForPerson(e.User);
             UpdateGreeting(e.User);
         }
 
