@@ -120,7 +120,15 @@ namespace FamilyNotes
             if (mode != RecognitionMode)
             {
                 RecognitionMode = mode;
-                await StartContinuousRecognition();
+
+                if (mode == SpeechRecognitionMode.Paused)
+                {
+                    await EndRecognitionSession();
+                }
+                else
+                {
+                    await StartContinuousRecognition();
+                }
             }
         }
 
@@ -191,14 +199,19 @@ namespace FamilyNotes
         /// the user's speech. Avoid this bug by awaiting the call to the <see cref="SpeakAsync"/> method 
         /// and then setting <see cref="RecognitionMode"/> to <see cref="SpeechRecognitionMode.Dictation"/>
         /// after it completes. This way, the speech prompt ends before recognition begins.</para>
+        /// <para>Also, the <see cref="SpeakAsync"/> method stops the current recognition session,
+        /// so the user and any spoken prompts don't trigger speech commands.</para>
         /// <para>The <see cref="SpeakAsync"/> method uses the <see cref="SemaphoreSlim"/> class to implement
-        /// a signal from the <see cref="MediaElement.MediaEnded"/> event to this method.
+        /// a signal from the <see cref="MediaElement.MediaEnded"/> event handler to this method.
         /// </para>
         /// </remarks>
         public async Task SpeakAsync(string phrase, MediaElement media)
         {
             if (!String.IsNullOrEmpty(phrase))
             {
+                // Turn off speech recognition while speech synthesis is happening.
+                await SetRecognitionMode(SpeechRecognitionMode.Paused);
+
                 MediaPlayerElement = media;
                 SpeechSynthesisStream synthesisStream = await SpeechSynth.SynthesizeTextToStreamAsync(phrase);
 
@@ -207,10 +220,14 @@ namespace FamilyNotes
                 media.AutoPlay = true;
                 media.SetSource(synthesisStream, synthesisStream.ContentType);
                 media.Play();
-
-                // Wait until the MediaEnded event on MediaElement is raised.
-                WaitHandle = Semaphore.AvailableWaitHandle;
-                WaitHandle.WaitOne();
+                
+                // Wait until the MediaEnded event on MediaElement is raised,
+                // before turning on speech recognition again. The semaphore
+                // is signaled in the mediaElement_MediaEnded event handler.
+                await Semaphore.WaitAsync();
+                
+                // Turn on speech recognition and listen for commands.
+                await SetRecognitionMode(SpeechRecognitionMode.CommandPhrases);
             }
         }
 
@@ -731,6 +748,7 @@ namespace FamilyNotes
 
         private void mediaElement_MediaEnded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
+            // Signal the SpeakAsync method.
             Semaphore.Release();
         }
 
@@ -740,7 +758,7 @@ namespace FamilyNotes
             {
                 if (_semaphore == null)
                 {
-                    _semaphore = new SemaphoreSlim(1);
+                    _semaphore = new SemaphoreSlim(0,1);
                 }
 
                 return _semaphore;

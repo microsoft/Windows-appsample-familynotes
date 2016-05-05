@@ -44,6 +44,11 @@ namespace FamilyNotes
         /// <summary>
         /// The speech recognizer listens for dictation.
         /// </summary>
-        Dictation
+        Dictation,
+
+        /// <summary>
+        /// The speech recognizer isn't listening for speech.
+        /// </summary>
+        Paused
     }
 }

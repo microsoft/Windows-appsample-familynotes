@@ -142,6 +142,9 @@ public async Task SpeakAsync(string phrase, MediaElement media)
 {
     if (!String.IsNullOrEmpty(phrase))
     {
+        // Turn off speech recognition while speech synthesis is happening.
+        await SetRecognitionMode(SpeechRecognitionMode.Paused);
+
         MediaPlayerElement = media;
         SpeechSynthesisStream synthesisStream = await SpeechSynth.SynthesizeTextToStreamAsync(phrase);
 
@@ -152,8 +155,10 @@ public async Task SpeakAsync(string phrase, MediaElement media)
         media.Play();
 
         // Wait until the MediaEnded event on MediaElement is raised.
-        WaitHandle = Semaphore.AvailableWaitHandle;
-        WaitHandle.WaitOne();
+        await Semaphore.WaitAsync();
+
+		// Turn on speech recognition and listen for commands.
+        await SetRecognitionMode(SpeechRecognitionMode.CommandPhrases);
     }
 }
 ```
