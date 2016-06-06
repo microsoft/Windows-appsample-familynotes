@@ -143,6 +143,27 @@ namespace FamilyNotes
             }
         }
 
+    
+        public int CountNotes(Person person)
+        {
+            // Each child control is a ContentPresenter that's wrapping a Note control.
+            var children = Children;
+            int count = 0;
+
+            foreach (var noteContentPresenter in children)
+            {
+                Note n = GetVisualChild<Note>(noteContentPresenter);
+                StickyNote sn = n.DataContext as StickyNote;
+                CompositeTransform ct = n.RenderTransform as CompositeTransform;
+
+                if (sn.NoteIsFor.FriendlyName == person.FriendlyName)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
         /// <summary>
         /// Raised when the value of a <see cref="Note"/> control's 
         /// <see cref="InputMode"/> property changes.

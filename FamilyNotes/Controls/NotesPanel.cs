@@ -84,6 +84,11 @@ namespace FamilyNotes
             CanvasControl.FilterNotes(person);
         }
 
+        public int CountNotes(Person person)
+        {
+           return CanvasControl.CountNotes(person);
+        }
+
         /// <summary>
         /// Raised when the value of a <see cref="Note"/> control's 
         /// <see cref="InputMode"/> property changes. 

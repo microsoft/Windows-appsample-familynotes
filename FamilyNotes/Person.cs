@@ -31,7 +31,7 @@ namespace FamilyNotes
     /// Represents a person in the FamilyNotes data model.
     /// </summary>
     [DataContract]
-    public class Person
+    public class Person : BindableBase
     {
 
         /// <summary>
@@ -61,13 +61,26 @@ namespace FamilyNotes
         /// Gets the profile image for the current <see cref="Person"/> instance.
         /// </summary>
         /// <remarks>This property isn't serialized.</remarks>
-        public BitmapImage FaceImage => new BitmapImage(IsProfileImage ? new Uri(ImageFileName) : new Uri(new Uri("ms-appx://"), ImageFileName));
+        public BitmapImage FaceImage => new BitmapImage(IsProfileImage ? new Uri(ImageFileName) : new Uri(new Uri("ms-appx://"), ImageFileName)) { CreateOptions = BitmapCreateOptions.IgnoreImageCache };
 
         /// <summary>
         /// Gets or sets the name of the image file for the current <see cref="Person"/> instance.
+        /// Also notifies the FaceImage that it needs to be updated.
         /// </summary>
         [DataMember]
-        public string ImageFileName { get; set; }
+        public string ImageFileName
+        {
+            get
+            {
+                return _imageFileName;
+            }
+            set
+            {
+                SetProperty(ref _imageFileName, value);
+                OnPropertyChanged(nameof(FaceImage));
+            }
+        }
 
+        private string _imageFileName;
     }
 }

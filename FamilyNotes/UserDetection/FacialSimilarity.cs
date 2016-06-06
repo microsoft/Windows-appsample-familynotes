@@ -42,6 +42,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Xml.Dom;
 using Windows.Storage;
+using Windows.UI.Xaml;
 
 namespace FamilyNotes.UserDetection
 {
@@ -52,8 +53,9 @@ namespace FamilyNotes.UserDetection
         /// Properties that stores the service key for Microsoft Face APIs and 
         /// that indicate whether the facelist has been created.
         /// </summary>
-        public static string FaceApiSubscriptionKey { get; set; } = "";
         public static bool InitialTrainingPerformed { get; private set; } = false;
+
+        
 
         /// <summary>
         /// Prepares for facial recognition by cacheing a single image for each user in a 
@@ -296,7 +298,7 @@ namespace FamilyNotes.UserDetection
         /// </summary>
         private static async Task LoadSettingsAsync()
         {
-            _faceClient = new FaceServiceClient(FaceApiSubscriptionKey);
+            _faceClient = new FaceServiceClient(((App)Application.Current).AppSettings.FaceApiKey);
 
             if (await ApplicationData.Current.LocalFolder.TryGetItemAsync("FaceSettings.xml") != null)
             {

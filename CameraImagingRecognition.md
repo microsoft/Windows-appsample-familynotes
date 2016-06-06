@@ -117,7 +117,7 @@ if ((faces.Count == 1) && !_holdForTimer && !_currentlyFiltered)
     _faceCaptureStill = await ApplicationData.Current.LocalFolder.CreateFileAsync("FaceDetected.jpg", CreationCollisionOption.ReplaceExisting);
     await _mediaCapture.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(), _faceCaptureStill);
 
-    if (FacialSimilarity.FaceApiSubscriptionKey != "" && FacialSimilarity.InitialTrainingPerformed)
+    if (((App)Application.Current).AppSettings.FaceApiKey != "" && FacialSimilarity.InitialTrainingPerformed)
     {
         var UserName = await FacialSimilarity.CheckForUserAsync(new Uri("ms-appdata:///local/FaceDetected.jpg"));
         if (UserName != "")

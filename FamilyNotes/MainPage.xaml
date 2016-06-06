@@ -1,4 +1,4 @@
-﻿<!--
+﻿  <!--
 Copyright (c) Microsoft Corporation.  All rights reserved.
 The MIT License (MIT)
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,7 +53,7 @@ THE SOFTWARE.
                         <Grid>
                             <SymbolIcon 
                                 Name="FaceDetectionDisabledIcon" 
-                                Symbol="Contact" 
+                                Symbol="WebCam" 
                                 Visibility="Visible"/>
                             <SymbolIcon 
                                 Name="FaceDetectionEnabledIcon" 
@@ -193,6 +193,7 @@ THE SOFTWARE.
                     ItemsSource="{x:Bind FamilyModel.Family}"
                     Tapped="FamilyList_Tapped"
                     Holding="FamilyList_Holding" 
+                    RightTapped="FamilyList_RightTap"
                     Grid.ColumnSpan="3"
                     Margin="0,0,0,78" >
                     
@@ -205,7 +206,7 @@ THE SOFTWARE.
                                 <Image 
                                     Width="80"
                                     Height="80"
-                                    Source="{x:Bind FaceImage}">
+                                    Source="{x:Bind FaceImage,Mode=OneWay}">
                                 </Image>
 
                                 <TextBlock

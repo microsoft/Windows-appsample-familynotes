@@ -39,7 +39,7 @@ THE SOFTWARE.
                     Height="40"
                     Margin="10,0"
                     Source="ms-appx:///Assets/StoreLogo.png" />
-                <TextBlock Text="Add a person" />
+                <TextBlock x:Name="DialogPurpose"  Text="Add a person" />
             </StackPanel>
         </DataTemplate>
     </ContentDialog.TitleTemplate>

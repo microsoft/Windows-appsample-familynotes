@@ -36,6 +36,7 @@ using Windows.Media.MediaProperties;
 using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 
 namespace FamilyNotes
 {
@@ -50,9 +51,13 @@ namespace FamilyNotes
         /// Initializes a new instance of the <see cref="UserPresence"/> class.
         /// </summary>
         /// <param name="dispatcher">The dispatcher.</param>
-        public UserPresence(CoreDispatcher dispatcher)
+        public UserPresence(CoreDispatcher dispatcher, string unfilteredName)
         {
             this._dispatcher = dispatcher;
+            _unfilteredName = unfilteredName;
+
+            // This is just here until we incorporate the NoFacesTime into the settings
+            NoFacesTime = 5000;
         }
         
         /// <summary>
@@ -102,8 +107,18 @@ namespace FamilyNotes
                         _pictureTimer.Dispose();
                     }
                 }
+                else if (_noFacesTimer != null)
+                {
+                    // If we are being manually set to any filter, then we need to dispose of the _noFacesTimer so we don't immediately revert
+                    _noFacesTimer.Dispose();
+                }
             }
         }
+
+        /// <summary>
+        /// The length of time (in milliseconds) to wait before resetting back to an unfiltered state if no faces are detected
+        /// </summary>
+        public int NoFacesTime{ get; set; }
 
         /// <summary>
         /// The DeviceID for the camera. This is only important if we are not using the default camera.
@@ -340,7 +355,32 @@ namespace FamilyNotes
         {
             FaceCount = $"{_detectionString} {faces.Count.ToString()}";
 
-            // For right now, we are only going to take an image the first time that we initialize face detection
+            // If we detect any faces, kill our no faces timer
+            if (faces.Count != 0)
+            {
+                if (_noFacesTimer != null)
+                {
+                    _noFacesTimer.Dispose();
+                }
+            }
+            // Otherwise, if we are filtering and don't have a timer
+            else if (_currentlyFiltered && (_noFacesTimer == null))
+            {
+                // Create a callback
+                TimerCallback noFacesCallback = (object stateInfo) =>
+                {
+                    _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => 
+                    {
+                        OnFilterOnFace(_unfilteredName);
+                        _noFacesTimer = null;
+                    });
+                    _noFacesTimer.Dispose();
+                };
+
+                // Set our timer
+                _noFacesTimer = new Timer(noFacesCallback, null, NoFacesTime, Timeout.Infinite);
+            }
+
             // We are also going to take an image the first time that we detect exactly one face.
             // Sidenote - to avoid a race-condition, I had to use a boolean. Just checking for _faceCaptureStill == null could produce an error.
             if ((faces.Count == 1) && !_holdForTimer && !_currentlyFiltered)
@@ -353,7 +393,7 @@ namespace FamilyNotes
                 await _mediaCapture.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(), _faceCaptureStill);
 
 
-                if (FacialSimilarity.FaceApiSubscriptionKey != "" && FacialSimilarity.InitialTrainingPerformed)
+                if (((App)Application.Current).AppSettings.FaceApiKey != "" && FacialSimilarity.InitialTrainingPerformed)
                 {
                     var UserName = await FacialSimilarity.CheckForUserAsync(new Uri("ms-appdata:///local/FaceDetected.jpg"));
                     if (UserName != "")
@@ -390,5 +430,7 @@ namespace FamilyNotes
         private string _faceCount = "0";
         private CoreDispatcher _dispatcher;
         private const string _detectionString = "Detected faces : ";
+        private static Timer _noFacesTimer;
+        private string _unfilteredName;
     }
 }

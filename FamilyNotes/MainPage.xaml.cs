@@ -69,6 +69,11 @@ namespace FamilyNotes
             
             // Update greeting that appears at the top of the screen e.g. "Good morning"
             UpdateGreeting(String.Empty);
+
+            // Create default notes if first launch
+            if (AppSettings.LaunchedPreviously != true)
+                 CreateDefaultNotes();
+
         }
 
         /// <summary>
@@ -78,7 +83,7 @@ namespace FamilyNotes
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            _presence = new UserPresence(_dispatcher);
+            _presence = new UserPresence(_dispatcher, _unfilteredName);
 
             _pageParameters = e.Parameter as VoiceCommandObjects.VoiceCommand;
             if (_pageParameters != null)
@@ -97,8 +102,7 @@ namespace FamilyNotes
             }
 
             //Perform initialization for facial detection.
-            FacialSimilarity.FaceApiSubscriptionKey = AppSettings.FaceApiKey;
-            if (FacialSimilarity.FaceApiSubscriptionKey != "")
+            if (AppSettings.FaceApiKey != "")
             {
                 await FacialSimilarity.TrainDetectionAsync();
             }
@@ -161,7 +165,7 @@ namespace FamilyNotes
 
         public void Public_AddNewPerson()
         {
-            AddNewPersonDialog();
+            AddNewPersonDialog(null); // Null means there is no existing person. But is this even called?!
         }
 
         #endregion
@@ -211,15 +215,34 @@ namespace FamilyNotes
                 now.Hour < 12 ? "Good morning" :
                 now.Hour < 18 ? "Good afternoon" :
                 /* otherwise */ "Good night";
-            var person = string.IsNullOrEmpty(name) ? "!" : $", {name}!";
+            var person = (string.IsNullOrEmpty(name) || name == App.EVERYONE) ? "!" : $", {name}!";
             TextGreeting.Text = $"{greeting}{person}";
 
-            if (_speechManager != null && !string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE))
             {
-                await _speechManager.SpeakAsync(TextGreeting.Text, _media);
+                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+
+                    var SpeakGreeting = $"{greeting} {name}";
+
+                    var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
+
+                   if ( notes > 0 )
+                    {                      
+                       if ( notes == 1 )
+                            SpeakGreeting += ",there is a note for you."; 
+                       else
+                            SpeakGreeting += $",there are {notes} notes for you.";
+                    }
+
+                    await this._speechManager.SpeakAsync(
+                        SpeakGreeting,
+                         this._media);
+                });
             }
         }
 
+      
 
         private async Task<bool> FocusedNoteAssigned()
         {
@@ -233,9 +256,9 @@ namespace FamilyNotes
             return focusedNote;
         }
 
-        private async void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
+        private void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
         {
-            Public_ShowNotesForPerson(e.User);
+            this.Public_ShowNotesForPerson(e.User);
             UpdateGreeting(e.User);
         }
 
@@ -273,17 +296,22 @@ namespace FamilyNotes
             _activeNote.NotePlaceholderText = "Type your note here.";
         }
 
-        private async void AddNewPersonDialog()
+
+      
+
+        private async void AddNewPersonDialog(Person currentPerson)
         {
             var dialog = new AddPersonContentDialog();
+           
+            dialog.ProvideExistingPerson(currentPerson);
             await dialog.ShowAsync();
             Person newPerson = dialog.AddedPerson;
 
             // If there is a valid person to add, add them
             if (newPerson != null)
             {
-                // Create a directory for the user (we do this regardless of whether or not there is a profile picture)
-                StorageFolder userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.FriendlyName), CreationCollisionOption.FailIfExists);
+                // Get or create a directory for the user (we do this regardless of whether or not there is a profile picture)
+                StorageFolder userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.FriendlyName), CreationCollisionOption.OpenIfExists);
 
                 // See if we have a profile photo
                 if (dialog.TemporaryFile != null)
@@ -293,22 +321,37 @@ namespace FamilyNotes
                     await dialog.TemporaryFile.DeleteAsync();
 
                     // Update the profile picture for the person
-                    newPerson.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
                     newPerson.IsProfileImage = true;
+                    newPerson.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
 
                     if (AppSettings.FaceApiKey != "")
-                    { 
+                    {
                         await FacialSimilarity.AddTrainingImageAsync(newPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{newPerson.FriendlyName}/ProfilePhoto.jpg"));
                     }
                 }
-                // Add the user now that changes have been made
-                await FamilyModel.AddPersonAsync(newPerson);
+                // Add the user if it is new now that changes have been made
+                if (currentPerson == null)
+                {
+                    await FamilyModel.AddPersonAsync(newPerson);
+                }
+                // Otherwise we had a user, so update the current one
+                else
+                {
+                    //await FamilyModel.UpdatePersonImageAsync(newPerson);
+                    Person personToUpdate = FamilyModel.PersonFromName(currentPerson.FriendlyName);
+                    if (personToUpdate != null)
+                    {
+                        personToUpdate.IsProfileImage = true;
+                        personToUpdate.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
+                    }
+                }
             }
         }
 
         private void AddPersonTapped(object sender, TappedRoutedEventArgs e)
         {
-            AddNewPersonDialog();
+            // Add null if there is no existing person
+            AddNewPersonDialog(null);
         }
 
         private async void FaceDetectionButton_Tapped(object sender, TappedRoutedEventArgs e)
@@ -399,7 +442,18 @@ namespace FamilyNotes
 
             // Determine whether or not we are currently filtering
             CurrentlyFiltered = selectedPerson.FriendlyName != _unfilteredName;
+
+            // Update greeting that appears at the top of the screen e.g. "Good morning"
+            UpdateGreeting(selectedPerson.FriendlyName);
         }
+
+
+        private void FamilyList_RightTap(object sender, RightTappedRoutedEventArgs e)
+        {
+            FamilyListMethod(e.OriginalSource as Image);
+        }
+
+
 
         /// <summary>
         /// When the user taps-and-holds on a person, a flyout menu appears. The menu options allow
@@ -418,12 +472,18 @@ namespace FamilyNotes
                 return;
             }
 
-            Image selectedImage = e.OriginalSource as Image;
+            FamilyListMethod(e.OriginalSource as Image);
+
+        }
+
+        private void FamilyListMethod(Image selectedImage)
+        {
+          //  Image selectedImage = e.OriginalSource as Image;
 
             // To find which person the user is touching, we look at the owner of the image. However,
             // sometimes the selected Image is null, because the user's finger isn't exactly in the right 
             // place, and is (for example) touching the text under the image. We return when this happens.
-          
+
             if (selectedImage == null)
             {
                 return;
@@ -436,36 +496,49 @@ namespace FamilyNotes
             // We use our subclass of MenuFlyoutItem to store the selected person
             // and so pass it to the menu option handlers.
 
-            var option1 = new myMenuFlyoutItem() { Text = "Create note for " + selectedPerson.FriendlyName };
-            var option2 = new myMenuFlyoutItem() { Text = "Delete " + selectedPerson.FriendlyName };
+            var option1 = new MenuFlyoutItem() { Text = "Create note for " + selectedPerson.FriendlyName };
+            var option2 = new MenuFlyoutItem() { Text = "Add/replace photo for " + selectedPerson.FriendlyName };
+            var option3 = new MenuFlyoutItem() { Text = "Delete " + selectedPerson.FriendlyName };
 
-            option1.SelectedPerson = selectedPerson;
-            option2.SelectedPerson = selectedPerson;
+            option1.Tag = selectedPerson;
+            option2.Tag = selectedPerson;
+            option3.Tag = selectedPerson;
 
-            option1.Click += menuFlyoutOptionCreateNote; 
-            option2.Click += menuFlyoutOptionDeletePerson;
+            option1.Click += menuFlyoutOptionCreateNote;
+            option2.Click += menuFlyoutOptionAddPhotoToPerson;
+            option3.Click += menuFlyoutOptionDeletePerson;
 
             menu.Items.Add(option1);
 
             if (selectedPerson.FriendlyName != App.EVERYONE)
             {
                 menu.Items.Add(option2);
+                menu.Items.Add(option3);
             }
-        
-            menu.ShowAt(selectedImage, new Point(60, 0));
 
+            menu.ShowAt(selectedImage, new Point(60, 0));
         }
 
         private void menuFlyoutOptionCreateNote(object sender, RoutedEventArgs e)
         {
-            var selectedPerson = ((myMenuFlyoutItem)sender).SelectedPerson;
-            CreateNote(selectedPerson);
+            Person selectedPerson = (Person)(sender as MenuFlyoutItem).Tag;
+            this.CreateNote(selectedPerson);
         }
 
         private async void menuFlyoutOptionDeletePerson(object sender, RoutedEventArgs e)
         {
-            Person selectedPerson = ((myMenuFlyoutItem)sender).SelectedPerson;
-            await FamilyModel.DeletePersonAsync(selectedPerson.FriendlyName);
+            Person selectedPerson = (Person)(sender as MenuFlyoutItem).Tag;
+            await this.FamilyModel.DeletePersonAsync(selectedPerson.FriendlyName);
+        }
+
+        private  void menuFlyoutOptionAddPhotoToPerson(object sender, RoutedEventArgs e)
+        {
+            Person selectedPerson = (Person)(sender as MenuFlyoutItem).Tag;
+
+             AddNewPersonDialog(selectedPerson);
+
+            // Do the things to make the add person
+
         }
 
         /// <summary>
@@ -675,6 +748,28 @@ namespace FamilyNotes
 
 #endregion
 
+
+        public void  CreateDefaultNotes()
+        {
+            this._activeNote = CreateNote(App.EVERYONE);
+            this._activeNote.NoteText = "6/6\n\nYou can also use voice commands, such as 'Add new note' Try 'What can I say?' for help.";
+
+            this._activeNote = CreateNote(App.EVERYONE);
+            this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the user's button on the left, or by turning on the camera if using face recognition.";
+
+            this._activeNote = CreateNote(App.EVERYONE);
+            this._activeNote.NoteText = "4/6\n\nNow you can add new notes by pressing the 'New note' button and selected 'Everyone' or another user.";
+
+            this._activeNote = CreateNote(App.EVERYONE);
+            this._activeNote.NoteText = "3/6\n\nIf you want to use face recognition feature, obtain a Key, read the legal disclaimer, and then take a clear snapshot.";
+
+            this._activeNote = CreateNote(App.EVERYONE);
+            this._activeNote.NoteText = "2/6\n\nTo get started, you should add some users by tapping on the 'New person' button at the bottom of the screen.";
+
+            this._activeNote = CreateNote(App.EVERYONE);
+            this._activeNote.NoteText = "1/6\n\nWelcome to Family Notes!\nOnce you have read these sample notes, you can delete them by tapping on the little X in the top left.";
+        }
+
 #region Private fields
 
         private StickyNote _activeNote;
@@ -686,15 +781,8 @@ namespace FamilyNotes
         private VoiceCommandObjects.VoiceCommand _pageParameters;
         private bool _currentlyFiltered;
         private const string _helpString = "You can say: add note for person, or, create note to person, or, new note to person. For the active note, you can say, edit note, read note, and delete note.";
-        
-#endregion
+
+        #endregion
     }
 
-    /// <summary>
-    /// Class to add a property to the menuflyoutitem class, so we can keep track of the person selected. 
-    /// </summary>
-    public class myMenuFlyoutItem : MenuFlyoutItem
-    {
-        public Person SelectedPerson { get; set; }
-    }
 }

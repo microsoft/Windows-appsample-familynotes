@@ -77,6 +77,22 @@ namespace FamilyNotes
         }
 
         /// <summary>
+        /// The default CameraID
+        /// </summary>
+        [DataMember]
+        public string DefaultCameraID
+        {
+            get
+            {
+                return _defaultCameraID;
+            }
+            set
+            {
+                SetProperty(ref _defaultCameraID, value);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the app background should be the Bing image of the day or not.
         /// </summary>
         [DataMember]
@@ -96,16 +112,32 @@ namespace FamilyNotes
                 }
             }
         }
-
+        /// <summary>
+        /// Gets or sets a flag to determine if this is the very first time the app has been launched
+        /// </summary>
+        [DataMember]
+        public bool LaunchedPreviously
+        {
+            get
+            {
+                return _launchedPreviously;
+            }
+            set
+            {
+                SetProperty(ref _launchedPreviously, value);
+            }
+        }
 
         /// <summary>
         /// Save app settings. These settings will roam.
         /// </summary>
         public void SaveSettings()
         {
-            ApplicationDataContainer settings = ApplicationData.Current.RoamingSettings;
+            ApplicationDataContainer settings = ApplicationData.Current.LocalSettings;
             settings.Values[WALLPAPER] = UseBingImageOfTheDay;
             settings.Values[MICRFOSOFT_FACESERVICE_KEY] = FaceApiKey;
+            settings.Values[NOTFIRSTLAUNCH] = true;
+            settings.Values[DEFAULTCAMERAID] = DefaultCameraID;
         }
 
         /// <summary>
@@ -113,11 +145,15 @@ namespace FamilyNotes
         /// </summary>
         public void LoadSettings()
         {
-            ApplicationDataContainer settings = ApplicationData.Current.RoamingSettings;
+            ApplicationDataContainer settings = ApplicationData.Current.LocalSettings;
             bool? useBingImage = (bool?)settings.Values[WALLPAPER];
             UseBingImageOfTheDay = useBingImage.HasValue ? useBingImage.Value : false;
             string faceApiKey = (string)settings.Values[MICRFOSOFT_FACESERVICE_KEY];
             FaceApiKey = faceApiKey != null ? faceApiKey : "";
+            bool? notFirstLaunch = (bool?)settings.Values[NOTFIRSTLAUNCH];
+            LaunchedPreviously = notFirstLaunch.HasValue ? notFirstLaunch.Value : false;
+            string defaultCameraID = (string)settings.Values[DEFAULTCAMERAID];
+            DefaultCameraID = defaultCameraID != null ? defaultCameraID : "";
         }
 
         
@@ -170,9 +206,13 @@ namespace FamilyNotes
         }
 
         private bool _useBingImageOfTheDay;
+        private bool _launchedPreviously;
+        private string _defaultCameraID;
         private string _faceApiKey = "";
         private BitmapImage _familyNotesWallPaper = new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg")); // Before the user has decided on the background, use the brushed steel.
         private const string WALLPAPER = "UseBingImageOfTheDay";
         private const string MICRFOSOFT_FACESERVICE_KEY = "MicrosoftFaceServiceKey";
+        private const string NOTFIRSTLAUNCH = "NotTheAppFirstLaunch";
+        private const string DEFAULTCAMERAID = "DefaultCameraID";
     }
 }

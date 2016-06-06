@@ -38,18 +38,46 @@ namespace FamilyNotes
     /// Dialog to add a person and take their picture
     /// </summary>
     public sealed partial class AddPersonContentDialog : ContentDialog
-    {   
+    {
+        static string TemporaryImagePath = "ms-appx:///Assets/face_1.png";
+
         public AddPersonContentDialog()
         {
             this.InitializeComponent();
+
+          
+
+
         }
-        
+
+        public void ProvideExistingPerson(Person currentPerson)
+        {
+            if (currentPerson == null)
+                return;
+
+            // Change UI slightly depending on if a photo already exists, or if this is the first time
+            // we're seeing this dialog to create a person.
+            PersonName.Text = currentPerson.FriendlyName;
+            PersonName.IsReadOnly = true;
+            textBlock.Text = "";
+            IsPrimaryButtonEnabled = true;
+            PrimaryButtonText = "Update photo";
+
+            // Set the image to the current image, if it exists
+            if (currentPerson.ImageFileName != TemporaryImagePath)
+            {
+                Uri imageUri = new Uri(currentPerson.ImageFileName, UriKind.Relative);
+                BitmapImage imageBitmap = new BitmapImage(imageUri);
+                image.Source = imageBitmap;
+            }
+        }
+
 
         /// <summary>
         /// The Person object that is created when the user selects to add a person through the dialog.
         /// This object is not created if the user cancels the Add User dialog.
         /// </summary>
-        public Person AddedPerson { get; private set; }
+        public Person AddedPerson { get;  set; }
 
         /// <summary>
         /// A file that contains the image added as part of the process for creating a user.
@@ -62,7 +90,7 @@ namespace FamilyNotes
 
         private void ContentDialog_AddPerson_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            AddedPerson = new Person(PersonName.Text, "ms-appx:///Assets/face_1.png");
+            AddedPerson = new Person(PersonName.Text, TemporaryImagePath);
         }
 
         private void ContentDialog_CancelButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -114,7 +142,6 @@ namespace FamilyNotes
             if (String.IsNullOrWhiteSpace(PersonName.Text))
             {
                 this.IsPrimaryButtonEnabled = false;
-                textBlock.Visibility = Visibility.Visible;
                 textBlock.Text = "Please enter a user name.";
                 return;
             }
@@ -133,7 +160,6 @@ namespace FamilyNotes
                 // path in which case we can't have a user with that name. Or there could be some other
                 // issue with that directory name. Regardless you can't use that name.
                 this.IsPrimaryButtonEnabled = false;
-                textBlock.Visibility = Visibility.Visible;
                 textBlock.Text = "Sorry, can't use that name.";
                 return;
             }
@@ -142,13 +168,12 @@ namespace FamilyNotes
             if (folderItem == null)
             {
                 this.IsPrimaryButtonEnabled = true;
-                textBlock.Visibility = Visibility.Collapsed;
+                textBlock.Text = "";
             }
             // If it does, then this user already exists
             else
             {
                 this.IsPrimaryButtonEnabled = false;
-                textBlock.Visibility = Visibility.Visible;
                 textBlock.Text = "This user name already exists.";
             }
         }
