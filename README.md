@@ -2,6 +2,9 @@
 
 **FamilyNotes** is a Universal Windows Platform (UWP) app sample that explores different input modalities and scenarios of user awareness. The FamilyNotes sample is essentially a bulletin board app that allows family members to leave notes for each other on a common PC/tablet just like they would a bulletin board. Using text, speech, ink, or pictures, a user can create a note and tag it for another user. Later when that other user approaches the PC/Tablet, the app uses imaging APIs and the Microsoft Cognitive Services (Face API) to detect their presence and display the notes that have been left for them, effectively filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). If the app isn’t open, a user can easily launch it and interact with it using Cortana.
 
+[![Using Ink, Voice, and Face Recognition in a UWP Video](Screenshots/Using_Ink_Voice_and_Face_Recognition_in_a_UWP_App_Video.PNG)](https://channel9.msdn.com/Blogs/One-Dev-Minute/Using-Ink-Voice-and-Face-Recognition-in-a-UWP-App "Channel 9 One Dev Minute video - Click to Watch")
+
+
  Be aware that the image understanding capabilities of the **FamilyNotes** app use Microsoft Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Microsoft Face APIs to Microsoft, please visit the Microsoft Cognitive Services website at www.microsoft.com/cognitive-services, and use the “Report Abuse” link at the bottom of the page to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839.
 
 
