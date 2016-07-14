@@ -57,6 +57,10 @@ The FamilyNotes app illustrates a number of platform features. For more detailed
 * [Using speech for note taking](Speech.md)
 * [Using the camera, imaging, and the Microsoft Cognitive Services (Face API) for facial recognition](CameraImagingRecognition.md)
 
+Also, some additional discussion and information about the sample is available on the Windows Developer blog in the following posts.
+* [FamilyNotes: Introducing a Windows UWP sample using ink, speech, and face recognition](https://blogs.windows.com/buildingapps/2016/06/21/familynotes-introducing-a-windows-uwp-sample-using-ink-speech-and-face-recognition/)
+* [FamilyNotes: Using the camera to detect a user](https://blogs.windows.com/buildingapps/2016/06/28/familynotes-using-the-camera-to-detect-a-user/)
+* [FamilyNotes: (Spoken) words and pictures](https://blogs.windows.com/buildingapps/2016/07/05/familynotes-spoken-words-and-pictures/)
 ## Code at a glance
 
 If you are interested in code snippets and don’t want to browse or run the full sample, check out the following files for examples of some highlighted features:
@@ -64,13 +68,14 @@ If you are interested in code snippets and don’t want to browse or run the ful
 * [Settings.cs](FamilyNotes/Settings.cs) : Downloads the Bing image of the day and allows for app config such as storing the developer key for the Microsoft Face API.
 * [BindableInkCanvas.cs](FamilyNotes/Controls/BindableInkCanvas.cs) : An `InkCanvas` control with a bindable `InkStrokeContainer`.
 * [Utils.cs](FamilyNotes/Utils.cs) : Delete a directory and its contents.
-* [App.xaml.cs](FamilyNotes/App.xaml.cs) : Saves/loads the people and their notes. Demonstrates serialization and how to handle saving multiple`InkStrokeContainers`to a stream.
+* [App.xaml.cs](FamilyNotes/App.xaml.cs) : Saves/loads the people and their notes. Demonstrates serialization and how to handle saving multiple `InkStrokeContainers` to a stream.
 * [AddPersonContentDialog.xaml.cs](FamilyNotes/AppDialogs/AddPersonContentDialog.xaml.cs) : Contains the add person dialog, which has an option to take a snapshot for a user when adding him or her. This picture is taken using the [CameraCaptureUI](https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.capture.cameracaptureui.aspx).
 * [UserPresence.cs](FamilyNotes/UserDetection/UserPresence.cs) : Contains the code that is responsible for taking pictures in the background. These pictures are then used for user identification.
 * [FacialSimilarity.cs](FamilyNotes/UserDetection/FacialSimilarity.cs) : Contains the code used to interact with the Microsoft Face APIs for the purpose of comparing a dynamically captured user image against a list of known users to obtain the most likely user present.
 
 ## See also
 [Microsoft Cognitive Services](http://www.microsoft.com/cognitive-services)  
+[Microsoft Cognitive Services samples](https://www.microsoft.com/cognitive-services/en-us/sdk-sample?author=microsoft&category=sample)    
 [Cortana interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/cortana-interactions)   
 [Cortana voice command sample](http://go.microsoft.com/fwlink/p/?LinkId=619899)  
 [Pen and stylus interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/pen-and-stylus-interactions)    
