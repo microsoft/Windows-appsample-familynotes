@@ -61,13 +61,14 @@ namespace FamilyNotes
 
             // Put the new note in a random position
             SetPosition(
-                new Random().Next(_notePositionMin, _notePositionMax), 
+                new Random().Next(_notePositionMin, _notePositionMax),
                 new Random().Next(_notePositionMin, _notePositionMax));
 
             // By default, make the note ready for text.
             // Should add code to test if it's created with a pen
             // and should then default to ink.
             containerForInk.InkPresenter.InputDeviceTypes =
+                Windows.UI.Core.CoreInputDeviceTypes.Touch |
                 Windows.UI.Core.CoreInputDeviceTypes.Mouse |
                 Windows.UI.Core.CoreInputDeviceTypes.Pen;
         }

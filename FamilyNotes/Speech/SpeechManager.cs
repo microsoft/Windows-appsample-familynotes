@@ -37,6 +37,8 @@ using Windows.Globalization;
 using Windows.Media.Capture;
 using Windows.Media.SpeechRecognition;
 using Windows.Media.SpeechSynthesis;
+using Windows.System;
+using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 
 namespace FamilyNotes
@@ -170,6 +172,8 @@ namespace FamilyNotes
                 // Keep track of the the recognition session's state.
                 IsInRecognitionSession = true;
 
+
+
 #if VERBOSE_DEBUG
                 Debug.WriteLine( "SpeechManager: Continuous recognition session started" );
 #endif
@@ -179,8 +183,15 @@ namespace FamilyNotes
                 Debug.WriteLine("SpeechManager: Failed to start continuous recognition session.");
 
                 var messageDialog = new Windows.UI.Popups.MessageDialog(
-                    ex.Message,
+                    $"{ex.Message}",
                     "Failed to start continuous recognition session");
+
+                messageDialog.Commands.Add(new UICommand("Go to settings...", async (command) =>
+                {
+                    bool result = await Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-microphone"));
+
+                }));
+                messageDialog.Commands.Add(new UICommand("Close", (command) => { }));
                 await messageDialog.ShowAsync();
             }
             finally

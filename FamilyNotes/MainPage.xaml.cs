@@ -23,7 +23,6 @@
 //  ---------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.IsolatedStorage;
 using System.Linq;
@@ -66,13 +65,13 @@ namespace FamilyNotes
 
             // Initially assume we are unfiltered - all notes are shown.
             CurrentlyFiltered = false;
-            
+
             // Update greeting that appears at the top of the screen e.g. "Good morning"
             UpdateGreeting(String.Empty);
 
             // Create default notes if first launch
             if (AppSettings.LaunchedPreviously != true)
-                 CreateDefaultNotes();
+                CreateDefaultNotes();
 
         }
 
@@ -88,7 +87,7 @@ namespace FamilyNotes
             _pageParameters = e.Parameter as VoiceCommandObjects.VoiceCommand;
             if (_pageParameters != null)
             {
-                switch(_pageParameters.VoiceCommandName)
+                switch (_pageParameters.VoiceCommandName)
                 {
                     case "addNewNote":
                         _activeNote = CreateNote(App.EVERYONE);
@@ -227,11 +226,11 @@ namespace FamilyNotes
 
                     var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
 
-                   if ( notes > 0 )
-                    {                      
-                       if ( notes == 1 )
-                            SpeakGreeting += ",there is a note for you."; 
-                       else
+                    if (notes > 0)
+                    {
+                        if (notes == 1)
+                            SpeakGreeting += ",there is a note for you.";
+                        else
                             SpeakGreeting += $",there are {notes} notes for you.";
                     }
 
@@ -242,7 +241,7 @@ namespace FamilyNotes
             }
         }
 
-      
+
 
         private async Task<bool> FocusedNoteAssigned()
         {
@@ -297,12 +296,12 @@ namespace FamilyNotes
         }
 
 
-      
+
 
         private async void AddNewPersonDialog(Person currentPerson)
         {
             var dialog = new AddPersonContentDialog();
-           
+
             dialog.ProvideExistingPerson(currentPerson);
             await dialog.ShowAsync();
             Person newPerson = dialog.AddedPerson;
@@ -363,7 +362,7 @@ namespace FamilyNotes
                 await messageDialog.ShowAsync();
                 return;
             }
-       
+
             if (SetCameraButton.IsEnabled)
             {
                 // Make sure the user accepts privacy implications.
@@ -478,7 +477,7 @@ namespace FamilyNotes
 
         private void FamilyListMethod(Image selectedImage)
         {
-          //  Image selectedImage = e.OriginalSource as Image;
+            //  Image selectedImage = e.OriginalSource as Image;
 
             // To find which person the user is touching, we look at the owner of the image. However,
             // sometimes the selected Image is null, because the user's finger isn't exactly in the right 
@@ -531,11 +530,11 @@ namespace FamilyNotes
             await this.FamilyModel.DeletePersonAsync(selectedPerson.FriendlyName);
         }
 
-        private  void menuFlyoutOptionAddPhotoToPerson(object sender, RoutedEventArgs e)
+        private void menuFlyoutOptionAddPhotoToPerson(object sender, RoutedEventArgs e)
         {
             Person selectedPerson = (Person)(sender as MenuFlyoutItem).Tag;
 
-             AddNewPersonDialog(selectedPerson);
+            AddNewPersonDialog(selectedPerson);
 
             // Do the things to make the add person
 
@@ -588,9 +587,9 @@ namespace FamilyNotes
             }
         }
 
-#endregion
+        #endregion
 
-#region Speech Handling
+        #region Speech Handling
 
         private async void speechManager_StateChanged(object sender, StateChangedEventArgs e)
         {
@@ -619,7 +618,7 @@ namespace FamilyNotes
             string msg = String.Format("Heard phrase: {0}", phrase);
             Debug.WriteLine(msg);
 
-            switch(verb)
+            switch (verb)
             {
                 case CommandVerb.Dictation:
                     {
@@ -629,7 +628,7 @@ namespace FamilyNotes
                         {
                             FocusedNote.NoteBusinessObject.NoteText = phrase;
                             await _speechManager.SetRecognitionMode(SpeechRecognitionMode.CommandPhrases);
-                         });
+                        });
 
                         break;
                     }
@@ -638,11 +637,11 @@ namespace FamilyNotes
                         // A command for creating a note was recognized.
                         await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                         {
-                             _activeNote = CreateNote(person);
-                             _activeNote.NoteText = "Dictate your note here!";
-                             await _speechManager.SpeakAsync("Dictate your note", _media);
-                             await _speechManager.SetRecognitionMode(SpeechRecognitionMode.Dictation);
-                         });
+                            _activeNote = CreateNote(person);
+                            _activeNote.NoteText = "Dictate your note here!";
+                            await _speechManager.SpeakAsync("Dictate your note", _media);
+                            await _speechManager.SetRecognitionMode(SpeechRecognitionMode.Dictation);
+                        });
 
                         break;
                     }
@@ -657,7 +656,7 @@ namespace FamilyNotes
                                 await _speechManager.SpeakAsync(
                                     FocusedNote.NoteBusinessObject.NoteText,
                                     _media);
-                             });
+                            });
                         }
 
                         break;
@@ -670,9 +669,9 @@ namespace FamilyNotes
                         {
                             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                             {
-                                 await _speechManager.SpeakAsync("Dictate your note", _media);
-                                 await _speechManager.SetRecognitionMode(SpeechRecognitionMode.Dictation);
-                             });
+                                await _speechManager.SpeakAsync("Dictate your note", _media);
+                                await _speechManager.SetRecognitionMode(SpeechRecognitionMode.Dictation);
+                            });
                         }
 
                         break;
@@ -686,8 +685,8 @@ namespace FamilyNotes
                             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                             {
                                 FocusedNote.OnDeleteNoteEvent();
-                                 await _speechManager.SpeakAsync("Note deleted", _media);
-                             });
+                                await _speechManager.SpeakAsync("Note deleted", _media);
+                            });
                         }
 
                         break;
@@ -704,7 +703,7 @@ namespace FamilyNotes
                         {
                             await _speechManager.SpeakAsync(_helpString, _media);
                         });
-                        
+
                         break;
                     }
                 default:
@@ -722,10 +721,10 @@ namespace FamilyNotes
         /// <param name="noteControl">The <see cref="Note"/> control.</param>
         /// <param name="e">The event data.</param>
         private async void taskPanel_NoteInputModeChanged(object sender, InputModeChangedEventArgs e)
-        {   
+        {
             // Transition out of dictation mode. 
-            if (_speechManager.RecognitionMode == 
-                SpeechRecognitionMode.Dictation &&    
+            if (_speechManager.RecognitionMode ==
+                SpeechRecognitionMode.Dictation &&
                 e.NewInputMode != NoteInputMode.Dictation)
             {
                 await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
@@ -734,7 +733,7 @@ namespace FamilyNotes
                 });
             }
             // Transition to dictation mode. 
-            else if (_speechManager.RecognitionMode != 
+            else if (_speechManager.RecognitionMode !=
                 SpeechRecognitionMode.Dictation &&
                 e.NewInputMode == NoteInputMode.Dictation)
             {
@@ -746,22 +745,22 @@ namespace FamilyNotes
             }
         }
 
-#endregion
+        #endregion
 
 
-        public void  CreateDefaultNotes()
+        public void CreateDefaultNotes()
         {
             this._activeNote = CreateNote(App.EVERYONE);
             this._activeNote.NoteText = "6/6\n\nYou can also use voice commands, such as 'Add new note' Try 'What can I say?' for help.";
 
             this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the user's button on the left, or by turning on the camera if using face recognition.";
+            this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the relevant user's button on the left, or by turning on the camera if using face recognition.";
 
             this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "4/6\n\nNow you can add new notes by pressing the 'New note' button and selected 'Everyone' or another user.";
+            this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Face API Key, add it to the app settings, and then enable the feature.";
 
             this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "3/6\n\nIf you want to use face recognition feature, obtain a Key, read the legal disclaimer, and then take a clear snapshot.";
+            this._activeNote.NoteText = "3/6\n\nNow you can add new notes by pressing the 'New note' button and selecting 'Everyone' or another user.";
 
             this._activeNote = CreateNote(App.EVERYONE);
             this._activeNote.NoteText = "2/6\n\nTo get started, you should add some users by tapping on the 'New person' button at the bottom of the screen.";
@@ -770,7 +769,7 @@ namespace FamilyNotes
             this._activeNote.NoteText = "1/6\n\nWelcome to Family Notes!\nOnce you have read these sample notes, you can delete them by tapping on the little X in the top left.";
         }
 
-#region Private fields
+        #region Private fields
 
         private StickyNote _activeNote;
         private static string _unfilteredName = App.EVERYONE;

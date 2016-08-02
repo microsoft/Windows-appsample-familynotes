@@ -113,7 +113,7 @@ THE SOFTWARE.
                     Opacity="1.0"
                     Text="Good afternoon!"
                     TextAlignment="Center"
-                    TextWrapping="Wrap" Foreground="White" />
+                    TextWrapping="Wrap" Foreground="White"  />
             </StackPanel>
 
             <Grid
@@ -159,19 +159,19 @@ THE SOFTWARE.
                         FontFamily="Segoe UI Symbol"
                         FontSize="60" 
                         Foreground="#FFD8B100" 
-                        Margin="0,-10,0,0" >&#xE21d;
+                        Margin="4,-10,0,0" >&#xE21d;
                     </TextBlock>
                     
                     <TextBlock 
                         FontFamily="Segoe UI Symbol"
                         FontSize="40"
                         Foreground="black"
-                        Margin="11,8,0,0" >&#xE119;
+                        Margin="17,8,0,0" >&#xE119;
                     </TextBlock>
                 </Grid>
                 
                 <TextBlock 
-                    Margin="-20,0,0,0"
+                    Margin="-9,0,0,0"
                     Foreground="White"
                     TextAlignment="Center">
                     New note
@@ -183,18 +183,13 @@ THE SOFTWARE.
                 Grid.RowSpan="2"
                 Margin="0,0,0,0">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="42*"/>
-                    <ColumnDefinition Width="59*"/>
-                    <ColumnDefinition Width="27*"/>
-                </Grid.ColumnDefinitions>
-             
                 <ListView
+                    HorizontalAlignment="Center"
                     ItemsSource="{x:Bind FamilyModel.Family}"
                     Tapped="FamilyList_Tapped"
                     Holding="FamilyList_Holding" 
                     RightTapped="FamilyList_RightTap"
-                    Grid.ColumnSpan="3"
+                    
                     Margin="0,0,0,78" >
                     
                     <ListView.ItemTemplate>
@@ -204,6 +199,7 @@ THE SOFTWARE.
                                 Opacity="1.0"  >
                                 
                                 <Image 
+                                    HorizontalAlignment="Center"
                                     Width="80"
                                     Height="80"
                                     Source="{x:Bind FaceImage,Mode=OneWay}">
