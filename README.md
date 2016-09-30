@@ -1,3 +1,7 @@
+﻿<!---
+  category: AudioVideoAndCamera SpeechAndCortana CustomUserInteractions AppSettings FilesFoldersAndLibraries Data
+-->
+
 # FamilyNotes sample
 
 **FamilyNotes** is a Universal Windows Platform (UWP) app sample that explores different input modalities and scenarios of user awareness. The FamilyNotes sample is essentially a bulletin board app that allows family members to leave notes for each other on a common PC/tablet just like they would a bulletin board. Using text, speech, ink, or pictures, a user can create a note and tag it for another user. Later when that other user approaches the PC/Tablet, the app uses imaging APIs and the Microsoft Cognitive Services (Face API) to detect their presence and display the notes that have been left for them, effectively filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). If the app isn’t open, a user can easily launch it and interact with it using Cortana.
