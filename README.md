@@ -1,5 +1,5 @@
 ﻿<!---
-  category: AudioVideoAndCamera SpeechAndCortana CustomUserInteractions AppSettings FilesFoldersAndLibraries Data
+  category: AudioVideoAndCamera SpeechAndCortana Inking CustomUserInteractions AppSettings FilesFoldersAndLibraries Data
 -->
 
 # FamilyNotes sample
