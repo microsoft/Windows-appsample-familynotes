@@ -4,17 +4,13 @@
 
 # FamilyNotes sample
 
-**FamilyNotes** is a Universal Windows Platform (UWP) app sample that explores different input modalities and scenarios of user awareness. The FamilyNotes sample is essentially a bulletin board app that allows family members to leave notes for each other on a common PC/tablet just like they would a bulletin board. Using text, speech, ink, or pictures, a user can create a note and tag it for another user. Later when that other user approaches the PC/Tablet, the app uses imaging APIs and the Microsoft Cognitive Services (Face API) to detect their presence and display the notes that have been left for them, effectively filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). If the app isn’t open, a user can easily launch it and interact with it using Cortana.
+A mini-app that explores different input modalities and scenarios of user awareness. A bulletin-board app that allows family members to leave notes for each other on a common PC/tablet just like they would on a bulletin board. Using text, speech, ink, or pictures, a user can create a note and tag it for another user. Later when that other user approaches the PC/Tablet, the app uses imaging APIs and the Microsoft Cognitive Services (Face API) to detect their presence and display the notes that have been left for them, effectively filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). If the app isn’t open, a user can easily launch it and interact with it using Cortana.
 
 [![Using Ink, Voice, and Face Recognition in a UWP Video](Screenshots/Using_Ink_Voice_and_Face_Recognition_in_a_UWP_App_Video.PNG)](https://channel9.msdn.com/Blogs/One-Dev-Minute/Using-Ink-Voice-and-Face-Recognition-in-a-UWP-App "Channel 9 One Dev Minute video - Click to Watch")
 
-
- Be aware that the image understanding capabilities of the **FamilyNotes** app use Microsoft Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Microsoft Face APIs to Microsoft, please visit the Microsoft Cognitive Services website at www.microsoft.com/cognitive-services, and use the “Report Abuse” link at the bottom of the page to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839.
-
-
+Be aware that the image understanding capabilities of the **FamilyNotes** app use Microsoft Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Microsoft Face APIs to Microsoft, please visit the Microsoft Cognitive Services website at www.microsoft.com/cognitive-services, and use the “Report Abuse” link at the bottom of the page to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839.
 
 ![FamilyNotes MainPage](Screenshots/FamilyNotes.PNG)
-
 
 ## Features
 
@@ -79,11 +75,12 @@ If you are interested in code snippets and don’t want to browse or run the ful
 * [FacialSimilarity.cs](FamilyNotes/UserDetection/FacialSimilarity.cs) : Contains the code used to interact with the Microsoft Face APIs for the purpose of comparing a dynamically captured user image against a list of known users to obtain the most likely user present.
 
 ## See also
+
 [Microsoft Cognitive Services](http://www.microsoft.com/cognitive-services)  
-[Microsoft Cognitive Services samples](https://www.microsoft.com/cognitive-services/en-us/sdk-sample?author=microsoft&category=sample)    
-[Cortana interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/cortana-interactions)   
+[Microsoft Cognitive Services samples](https://www.microsoft.com/cognitive-services/en-us/sdk-sample?author=microsoft&category=sample)  
+[Cortana interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/cortana-interactions)  
 [Cortana voice command sample](http://go.microsoft.com/fwlink/p/?LinkId=619899)  
-[Pen and stylus interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/pen-and-stylus-interactions)    
+[Pen and stylus interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/pen-and-stylus-interactions)  
 [Simple ink sample](http://go.microsoft.com/fwlink/p/?LinkID=620312)  
 [Complex ink sample](http://go.microsoft.com/fwlink/p/?LinkID=620314)  
 [Speech recognition and synthesis sample](https://github.com/Microsoft/Windows-universal-samples/tree/master/Samples/SpeechRecognitionAndSynthesis)  
