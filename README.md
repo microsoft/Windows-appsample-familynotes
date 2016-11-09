@@ -4,7 +4,14 @@
 
 # FamilyNotes sample
 
-A mini-app that explores different input modalities and scenarios of user awareness. A bulletin-board app that allows family members to leave notes for each other on a common PC/tablet just like they would on a bulletin board. Using text, speech, ink, or pictures, a user can create a note and tag it for another user. Later when that other user approaches the PC/Tablet, the app uses imaging APIs and the Microsoft Cognitive Services (Face API) to detect their presence and display the notes that have been left for them, effectively filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). If the app isn’t open, a user can easily launch it and interact with it using Cortana.
+A mini-app that explores different input modalities and scenarios of user awareness. A bulletin-board app that allows family members 
+to leave notes for each other on a common PC/tablet just like they would on a bulletin board. Using text, speech, ink, or pictures, 
+a user can create a note and tag it for another user. Later when that other user approaches the PC/Tablet, the app uses imaging APIs 
+and the Microsoft Cognitive Services (Face API) to detect their presence and display the notes that have been left for them, effectively 
+filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). 
+If the app isn’t open, a user can easily launch it and interact with it using Cortana. 
+
+This sample runs on the Universal Windows Platform (UWP). 
 
 [![Using Ink, Voice, and Face Recognition in a UWP Video](Screenshots/Using_Ink_Voice_and_Face_Recognition_in_a_UWP_App_Video.PNG)](https://channel9.msdn.com/Blogs/One-Dev-Minute/Using-Ink-Voice-and-Face-Recognition-in-a-UWP-App "Channel 9 One Dev Minute video - Click to Watch")
 
