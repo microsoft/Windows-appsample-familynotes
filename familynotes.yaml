@@ -3,7 +3,8 @@ sample:
 - name: Family notes sample
   description: A mini-app that explores different input modalities and scenarios of user awareness. A bulletin-board app that allows family members 
 to leave notes for each other on a common PC/tablet just like they would on a bulletin board.
-  generateZip: false
+  image: Screenshots/FamilyNotes.PNG
+  generateZip: true
   author: karler
   languages:
   - csharp
