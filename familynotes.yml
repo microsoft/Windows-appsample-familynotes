@@ -5,7 +5,7 @@ sample:
 to leave notes for each other on a common PC/tablet just like they would on a bulletin board.
   image: Screenshots/FamilyNotes.PNG
   generateZip: true
-  author: karler
+  author: JoshuaPartlow
   languages:
   - csharp
   technologies:
