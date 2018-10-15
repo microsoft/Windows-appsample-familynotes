@@ -8,7 +8,6 @@ to leave notes for each other on a common PC/tablet just like they would on a bu
   author: karler
   languages:
   - csharp
-  - xaml
   technologies:
   - windows
   vssolution: FamilyNotes.sln
