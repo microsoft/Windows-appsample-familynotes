@@ -1,6 +1,13 @@
-﻿<!---
-  category: AudioVideoAndCamera SpeechAndCortana Inking CustomUserInteractions AppSettings FilesFoldersAndLibraries Data
--->
+﻿---
+topic: sample
+languages:
+- csharp
+products:
+- windows
+- uwp
+statusNotificationTargets:
+- codefirst
+---
 
 # FamilyNotes sample
 
