@@ -1,4 +1,4 @@
----
+﻿---
 topic: sample
 languages:
 - csharp
@@ -8,6 +8,10 @@ products:
 statusNotificationTargets:
 - codefirst
 ---
+
+<!---
+  category: AudioVideoAndCamera SpeechAndCortana Inking CustomUserInteractions AppSettings FilesFoldersAndLibraries Data
+-->
 
 # FamilyNotes sample
 
