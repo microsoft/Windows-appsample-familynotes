@@ -107,3 +107,5 @@ If you are interested in code snippets and don’t want to browse or run the ful
 [Simple ink sample](http://go.microsoft.com/fwlink/p/?LinkID=620312)  
 [Complex ink sample](http://go.microsoft.com/fwlink/p/?LinkID=620314)  
 [Speech recognition and synthesis sample](https://github.com/Microsoft/Windows-universal-samples/tree/master/Samples/SpeechRecognitionAndSynthesis)  
+
+
