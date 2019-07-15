@@ -1,12 +1,13 @@
 ---
-topic: sample
+page_type: sample
 languages:
 - csharp
 products:
 - windows
 - windows-uwp
 statusNotificationTargets:
-- codefirst
+- codefirst@microsoft.com
+description: "A mini-app that explores different input modalities and scenarios of user awareness."
 ---
 
 <!---
