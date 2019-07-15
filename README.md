@@ -102,7 +102,7 @@ If you are interested in code snippets and don’t want to browse or run the ful
 
 [Microsoft Cognitive Services](http://www.microsoft.com/cognitive-services)  
 [Microsoft Cognitive Services samples](https://www.microsoft.com/cognitive-services/en-us/sdk-sample?author=microsoft&category=sample)  
-[Cortana interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/cortana-interactions)  
+[Cortana interactions](https://msdn.microsoft.com/windows/uwp/input-and-devices/cortana-interactions)  
 [Cortana voice command sample](http://go.microsoft.com/fwlink/p/?LinkId=619899)  
 [Pen and stylus interactions](https://msdn.microsoft.com/en-us/windows/uwp/input-and-devices/pen-and-stylus-interactions)  
 [Simple ink sample](http://go.microsoft.com/fwlink/p/?LinkID=620312)  
