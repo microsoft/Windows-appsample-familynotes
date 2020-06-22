@@ -44,6 +44,12 @@ The FamilyNotes app demonstrates:
 * JSON serialization using the [DataContractJsonSerializer](https://msdn.microsoft.com/en-us/library/system.runtime.serialization.json.datacontractjsonserializer.aspx) class.
 * Setting the app wallpaper using the [Bing image of the day task snippet](https://github.com/Microsoft/Windows-task-snippets/blob/master/tasks/Bing-image-of-the-day-URI.md).
 
+## June 2020 update
+
+This update includes:
+
+* Refactoring for WinUI 2.4 controls, specifically [PersonPicture](https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/person-picture).
+
 ## Universal Windows Platform development
 
 ### Prerequisites
