@@ -24,7 +24,7 @@ THE SOFTWARE.
     xmlns:local="using:FamilyNotes"
     RequestedTheme="Light">
     <Application.Resources>
-        <x:String x:Key="String1">HERE</x:String>
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
     </Application.Resources>
 
 </Application>

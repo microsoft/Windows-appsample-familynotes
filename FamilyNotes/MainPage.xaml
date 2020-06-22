@@ -81,7 +81,7 @@ THE SOFTWARE.
             Background="{x:Bind AppSettings.FamilyNotesWallPaper, Converter={StaticResource BitmapToBrushConverter}, Mode=OneWay}" >
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="nameColumn" Width="116" />
+                <ColumnDefinition x:Name="nameColumn" Width="auto" />
                 <ColumnDefinition x:Name="notesColumn" Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -151,7 +151,8 @@ THE SOFTWARE.
                 Grid.RowSpan="2"
                 Margin="0,-60,0,-30">
                 <Grid
-                    Margin="15,0,0,0"
+                    HorizontalAlignment="Center"
+                    Margin="-15,0,0,0"
                     Grid.Column="0"
                     Tapped="NewNote_Tapped">
                     
@@ -171,7 +172,7 @@ THE SOFTWARE.
                 </Grid>
                 
                 <TextBlock 
-                    Margin="-9,0,0,0"
+                    Margin="0,0,0,0"
                     Foreground="White"
                     TextAlignment="Center">
                     New note
@@ -194,22 +195,25 @@ THE SOFTWARE.
                     
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="local:Person">
+                            
                             <StackPanel
                                 Margin="0,10,0,0" 
                                 Opacity="1.0"  >
-                                
-                                <Image 
-                                    HorizontalAlignment="Center"
+
+                                <PersonPicture
                                     Width="80"
                                     Height="80"
-                                    Source="{x:Bind FaceImage,Mode=OneWay}">
-                                </Image>
+                                    ProfilePicture="{x:Bind FaceImage,Mode=OneWay}"
+                                    DisplayName="{x:Bind FriendlyName}">
+                                </PersonPicture>
 
                                 <TextBlock
                                     TextAlignment="Center"
                                     Foreground="White"
                                     Text="{x:Bind FriendlyName}">
                                 </TextBlock>
+                                
+                                
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -402,12 +406,15 @@ THE SOFTWARE.
                                     Margin="8,10,0,0"
                                     Opacity="1.0">
                                     
-                                    <Image 
-                                        Width="80"
-                                        Height="80"
-                                        Source="{x:Bind FaceImage}">
-                                    </Image>
+                                    <PersonPicture
+                                    Width="80"
+                                    Height="80"
+                                    ProfilePicture="{x:Bind FaceImage,Mode=OneWay}"
+                                    DisplayName="{x:Bind FriendlyName}">
+                                    </PersonPicture>
                                     
+                                    
+
                                     <TextBlock
                                         TextAlignment="Center"
                                         Foreground="White"
