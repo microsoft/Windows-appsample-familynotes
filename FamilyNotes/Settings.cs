@@ -61,7 +61,23 @@ namespace FamilyNotes
         }
 
         /// <summary>
-        /// Your key for the Microsoft Face API that allows you to use the service
+        /// Your endpoint for the Azure Face service that allows you to use the service
+        /// </summary>
+        [DataMember]
+        public string FaceApiEndpoint
+        {
+            get
+            {
+                return _faceApiEndpoint;
+            }
+            set
+            {
+                SetProperty(ref _faceApiEndpoint, value);
+            }
+        }
+
+        /// <summary>
+        /// Your key for the Azure Face service that allows you to use the service
         /// </summary>
         [DataMember]
         public string FaceApiKey
@@ -75,6 +91,8 @@ namespace FamilyNotes
                 SetProperty(ref _faceApiKey, value);
             }
         }
+
+        
 
         /// <summary>
         /// The default CameraID
@@ -209,6 +227,7 @@ namespace FamilyNotes
         private bool _launchedPreviously;
         private string _defaultCameraID;
         private string _faceApiKey = "";
+        private string _faceApiEndpoint = "";
         private BitmapImage _familyNotesWallPaper = new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg")); // Before the user has decided on the background, use the brushed steel.
         private const string WALLPAPER = "UseBingImageOfTheDay";
         private const string MICRFOSOFT_FACESERVICE_KEY = "MicrosoftFaceServiceKey";

@@ -30,8 +30,8 @@
     http://research.microsoft.com/en-us/UM/legal/DeveloperCodeofConductforCognitiveServices.htm.
 */
 
-using Microsoft.ProjectOxford.Face;
-using Microsoft.ProjectOxford.Face.Contract;
+using Microsoft.Azure.CognitiveServices.Vision.Face;
+using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -50,7 +50,7 @@ namespace FamilyNotes.UserDetection
     {
 
         /// <summary>
-        /// Properties that stores the service key for Microsoft Face APIs and 
+        /// Properties that stores the service key for Azure Face service and 
         /// that indicate whether the facelist has been created.
         /// </summary>
         public static bool InitialTrainingPerformed { get; private set; } = false;
@@ -96,22 +96,22 @@ namespace FamilyNotes.UserDetection
                 return FacesAdded;
             }
 
-            // Delete any existing FaceList held by the Microsoft Face service. Exception is thrown and surpressed if specified list didn't exist.
+            // Delete any existing FaceList held by the Azure Face service. Exception is thrown and surpressed if specified list didn't exist.
             try
             {
                 await WaitOnTransactionCapAsync();
-                await _faceClient.DeleteFaceListAsync(_listKey);
+                await _faceClient.FaceList.DeleteAsync(_listKey);
                 _transactionCount++;
             }
             catch (Exception)
             {
             }
 
-            // Create a new FaceList in the Microsoft Face service for persistent Face storage.
+            // Create a new FaceList in the Azure Face service for persistent Face storage.
             try
             {
                 await WaitOnTransactionCapAsync();
-                await _faceClient.CreateFaceListAsync(_listKey, _listKey, "");
+                await _faceClient.FaceList.CreateAsync(_listKey, _listKey, "");
                 _transactionCount++;
             }
             catch (Exception)
@@ -133,15 +133,15 @@ namespace FamilyNotes.UserDetection
                     {
                         // Adds face to list and gets persistent face ID.
                         await WaitOnTransactionCapAsync();
-                        var DetectedFaceID = await _faceClient.AddFaceToFaceListAsync(_listKey, UserImageFilestream, UserName);
+                        var DetectedFaceID = await _faceClient.FaceList.AddFaceFromStreamAsync(_listKey, UserImageFilestream, UserName);
                         _transactionCount++;
                         _userFacialIDs.Add(UserName, DetectedFaceID.PersistedFaceId);
                         _userNames.Add(DetectedFaceID.PersistedFaceId, UserName);
                         FacesAdded++;
                     }
-                    catch (Microsoft.ProjectOxford.Face.FaceAPIException)
+                    catch(Exception)
                     {
-                        // This exception occurs when the Microsoft Face API AddFaceToListAsync service call isn't able to detect a singlular face 
+                        // This exception occurs when the Azure Face service AddFaceToListAsync call isn't able to detect a singlular face 
                         // in the profile picture. Additional logic could be added to better determine the cause of failure and surface that to
                         // the app for retry.
                     }
@@ -168,7 +168,7 @@ namespace FamilyNotes.UserDetection
                     StorageFile UserImage = await StorageFile.GetFileFromApplicationUriAsync(Image);
                     var UserImageFilestream = File.OpenRead(UserImage.Path);
                     await WaitOnTransactionCapAsync();
-                    var DetectedFaceID = await _faceClient.AddFaceToFaceListAsync(_listKey, UserImageFilestream, Name);
+                    var DetectedFaceID = await _faceClient.FaceList.AddFaceFromStreamAsync(_listKey, UserImageFilestream, Name);
                     _transactionCount++;
                     _userFacialIDs.Add(Name, DetectedFaceID.PersistedFaceId);
                     _userNames.Add(DetectedFaceID.PersistedFaceId, Name);
@@ -201,7 +201,7 @@ namespace FamilyNotes.UserDetection
             {
                 FaceID = _userFacialIDs[name];
                 await WaitOnTransactionCapAsync();
-                await _faceClient.DeleteFaceFromFaceListAsync(_listKey, FaceID);
+                await _faceClient.FaceList.DeleteFaceAsync(_listKey, FaceID);
                 _transactionCount++;
             }
             catch (Exception)
@@ -219,7 +219,7 @@ namespace FamilyNotes.UserDetection
         }
 
         /// <summary>
-        /// Submits a dynamically taken image to the Microsoft Face API for Similarity comparison against stored detected faces
+        /// Submits a dynamically taken image to the Azure Face service for Similarity comparison against stored detected faces
         /// from TrainDetectionAsync. Of the faces checked, the one that is the closest match (if a match is found) is returned.
         /// </summary>
         public static async Task<string> CheckForUserAsync(Uri UnidentifiedImage)
@@ -231,11 +231,11 @@ namespace FamilyNotes.UserDetection
             {
                 //Gets ID for face, which is good for 24 hours. 
                 //Should we error check for multiple faces or no faces?
-                Face[] DetectedFaces;
+                IList<DetectedFace> DetectedFaces;
                 await WaitOnTransactionCapAsync();
                 try
                 {
-                    DetectedFaces = await _faceClient.DetectAsync(DynamicUserImageFilestream);
+                    DetectedFaces = await _faceClient.Face.DetectWithStreamAsync(DynamicUserImageFilestream);
                     _transactionCount++;
                 }
                 catch (Exception)
@@ -244,21 +244,21 @@ namespace FamilyNotes.UserDetection
                     return "";
                 }
 
-                Guid DynamicID;
-                if (DetectedFaces.Length > 0)
+                Guid? DynamicID = null;
+                if (DetectedFaces.Count > 0)
                     DynamicID = DetectedFaces[0].FaceId;
 
-                FaceList SavedUserFaces = null;
-                SimilarPersistedFace[] FacialSimilarityResults;
+                //FaceList SavedUserFaces = null;
+                IList<SimilarFace> FacialSimilarityResults;
                 try
                 {
-                    await WaitOnTransactionCapAsync();
-                    SavedUserFaces = await _faceClient.GetFaceListAsync(_listKey);
-                    _transactionCount++;
+                    //await WaitOnTransactionCapAsync();
+                    //SavedUserFaces = await _faceClient.GetFaceListAsync(_listKey);
+                    //_transactionCount++;
 
                     await WaitOnTransactionCapAsync();
                     _transactionCount++;
-                    FacialSimilarityResults = await _faceClient.FindSimilarAsync(DynamicID, _listKey);
+                    FacialSimilarityResults = await _faceClient.Face.FindSimilarAsync(DynamicID.Value, _listKey);
                 }
                 catch
                 {
@@ -267,12 +267,12 @@ namespace FamilyNotes.UserDetection
                 }
 
                 _semaphore.Release();
-                return FacialSimilarityResults.Length == 0 ? "" : _userNames[FacialSimilarityResults[0].PersistedFaceId];
+                return FacialSimilarityResults.Count == 0 ? "" : _userNames[FacialSimilarityResults[0].PersistedFaceId.Value];
             }
         }
 
         /// <summary>
-        /// Deletes persistent face data from the Microsoft Face service, as well as the file storing keys.
+        /// Deletes persistent face data from the Azure Face service, as well as the file storing keys.
         /// </summary>
         public static async Task ClearFaceDetectionDataAsync()
         {
@@ -280,7 +280,7 @@ namespace FamilyNotes.UserDetection
             await CheckTransactionCapAsync();
             // Delete data from the service
             await WaitOnTransactionCapAsync();
-            await _faceClient.DeleteFaceListAsync(_listKey);
+            await _faceClient.FaceList.DeleteAsync(_listKey);
             _transactionCount++;
             _listKey = "";
 
@@ -298,7 +298,8 @@ namespace FamilyNotes.UserDetection
         /// </summary>
         private static async Task LoadSettingsAsync()
         {
-            _faceClient = new FaceServiceClient(((App)Application.Current).AppSettings.FaceApiKey);
+            _faceClient = new FaceClient(new ApiKeyServiceClientCredentials(((App)Application.Current).AppSettings.FaceApiKey)) 
+                { Endpoint = ((App)Application.Current).AppSettings.FaceApiEndpoint };
 
             if (await ApplicationData.Current.LocalFolder.TryGetItemAsync("FaceSettings.xml") != null)
             {
@@ -376,9 +377,9 @@ namespace FamilyNotes.UserDetection
         private static Dictionary<string, Guid> _userFacialIDs = new Dictionary<string, Guid>();
         private static Dictionary<Guid, string> _userNames = new Dictionary<Guid, string>();
 
-        // Microsoft Face API service client object and keys for the Face service and persistent face list.
+        // Azure Face service client object and keys for the Face service and persistent face list.
         // The Service key is set by bound UI setting.
-        private static FaceServiceClient _faceClient;
+        private static IFaceClient _faceClient;
         private static string _listKey;
 
 

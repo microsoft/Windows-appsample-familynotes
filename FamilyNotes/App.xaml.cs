@@ -66,7 +66,7 @@ namespace FamilyNotes
         }
 
         /// <summary>
-        ///  Settings such as the Microsoft Face API key, and the background setting
+        ///  Settings such as the Azure Face service key, and the background setting
         /// </summary>
         public Settings AppSettings
         {

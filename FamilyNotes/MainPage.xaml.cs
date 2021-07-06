@@ -355,10 +355,10 @@ namespace FamilyNotes
 
         private async void FaceDetectionButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            // Inform the user if we do not have a Microsoft face service key and then exit without doing anything
+            // Inform the user if we do not have a Azure Face service key and then exit without doing anything
             if (AppSettings.FaceApiKey == "")
             {
-                var messageDialog = new Windows.UI.Popups.MessageDialog("You need a Microsoft Face API service key, which you define in settings, to use facial recognition.");
+                var messageDialog = new Windows.UI.Popups.MessageDialog("You need a Azure Face service key, which you define in settings, to use facial recognition.");
                 await messageDialog.ShowAsync();
                 return;
             }
