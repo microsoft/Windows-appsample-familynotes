@@ -757,7 +757,7 @@ namespace FamilyNotes
             this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the relevant user's button on the left, or by turning on the camera if using face recognition.";
 
             this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Face API Key, add it to the app settings, and then enable the feature.";
+            this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Azure Face Service API Key and endpoint, add them to the app settings, and then enable the feature.";
 
             this._activeNote = CreateNote(App.EVERYONE);
             this._activeNote.NoteText = "3/6\n\nNow you can add new notes by pressing the 'New note' button and selecting 'Everyone' or another user.";

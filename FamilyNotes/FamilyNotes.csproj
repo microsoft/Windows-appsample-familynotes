@@ -106,7 +106,6 @@
     <Compile Include="StickyNote.cs" />
     <Compile Include="UserDetection\FacialSimilarity.cs" />
     <Compile Include="UserDetection\UserPresence.cs" />
-    <Compile Include="Utils.cs" />
     <Compile Include="VoiceCommandObjects\VoiceCommands.cs" />
   </ItemGroup>
   <ItemGroup>

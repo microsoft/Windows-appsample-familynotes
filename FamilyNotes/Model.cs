@@ -30,6 +30,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.VoiceCommands;
+using Windows.Storage;
 
 namespace FamilyNotes
 {
@@ -130,7 +131,8 @@ namespace FamilyNotes
             bool success = true;
             if (name != App.EVERYONE) // the everyone user is permanent. We'll delete the notes for Everyone but not the actual person named 'Everyone'
             {
-                success = await IsolatedStorageFile.GetUserStoreForApplication().DeleteDirectoryAsync($@"Users\{name}"); // uses extension method found in Utils.cs
+                var userFolder = await ApplicationData.Current.LocalFolder.GetFolderAsync($@"Users\{name}");
+                await userFolder.DeleteAsync();
                 this.Family.Remove(PersonFromName(name)); // Speech listens to changes on this collection and will update grammar, etc.
             }
 

@@ -257,10 +257,11 @@ namespace FamilyNotes.UserDetection
                     //_transactionCount++;
 
                     await WaitOnTransactionCapAsync();
-                    _transactionCount++;
                     FacialSimilarityResults = await _faceClient.Face.FindSimilarAsync(DynamicID.Value, _listKey);
+                    _transactionCount++;
                 }
-                catch
+                //catch
+                catch(Exception e)
                 {
                     _semaphore.Release();
                     return "";
