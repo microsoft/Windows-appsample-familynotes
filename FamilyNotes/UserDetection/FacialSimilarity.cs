@@ -252,9 +252,6 @@ namespace FamilyNotes.UserDetection
                 IList<SimilarFace> FacialSimilarityResults;
                 try
                 {
-                    //await WaitOnTransactionCapAsync();
-                    //SavedUserFaces = await _faceClient.GetFaceListAsync(_listKey);
-                    //_transactionCount++;
 
                     await WaitOnTransactionCapAsync();
                     FacialSimilarityResults = await _faceClient.Face.FindSimilarAsync(DynamicID.Value, _listKey);
