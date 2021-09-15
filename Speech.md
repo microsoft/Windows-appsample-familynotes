@@ -98,10 +98,10 @@ public async Task StartContinuousRecognition()
 
         var messageDialog = new Windows.UI.Popups.MessageDialog(
             ex.Message,
-            "Failed to start continuous recognition session");
+            "Failed to start continuous recognition session.");
         messageDialog.Commands.Add(new UICommand("Go to settings...", async (command) =>
         {
-            bool result = await Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-microphone"));
+            bool result = await Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-speech"));
 
         }));
         messageDialog.Commands.Add(new UICommand("Close", (command) => { }));

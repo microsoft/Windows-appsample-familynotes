@@ -355,10 +355,10 @@ namespace FamilyNotes
 
         private async void FaceDetectionButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            // Inform the user if we do not have a Microsoft face service key and then exit without doing anything
+            // Inform the user if we do not have a Azure Face service key and then exit without doing anything
             if (AppSettings.FaceApiKey == "")
             {
-                var messageDialog = new Windows.UI.Popups.MessageDialog("You need a Microsoft Face API service key, which you define in settings, to use facial recognition.");
+                var messageDialog = new Windows.UI.Popups.MessageDialog("You need a Azure Face service key, which you define in settings, to use facial recognition.");
                 await messageDialog.ShowAsync();
                 return;
             }
@@ -757,7 +757,7 @@ namespace FamilyNotes
             this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the relevant user's button on the left, or by turning on the camera if using face recognition.";
 
             this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Face API Key, add it to the app settings, and then enable the feature.";
+            this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Azure Face Service API Key and endpoint, add them to the app settings, and then enable the feature.";
 
             this._activeNote = CreateNote(App.EVERYONE);
             this._activeNote.NoteText = "3/6\n\nNow you can add new notes by pressing the 'New note' button and selecting 'Everyone' or another user.";

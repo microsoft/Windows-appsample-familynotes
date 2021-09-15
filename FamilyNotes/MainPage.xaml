@@ -275,6 +275,8 @@ THE SOFTWARE.
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
                         
                         <Grid.ColumnDefinitions>
@@ -311,7 +313,7 @@ THE SOFTWARE.
                         </Button>
 
                         <TextBlock 
-                            Text="Set Microsoft Face API service key" 
+                            Text="Set Azure Face service endpoint" 
                             Grid.Row="3" 
                             Grid.ColumnSpan="2"
                             HorizontalAlignment="Left" 
@@ -321,25 +323,43 @@ THE SOFTWARE.
                             TextAlignment="Left"/>
                         
                         <TextBox
-                            x:Name="MicrosoftFaceAPIServiceKey"
+                            x:Name="AzureFaceServiceEndpoint"
                             Grid.Row="4" 
+                            Grid.ColumnSpan="2"
+                            Margin="10,0,10,0"
+                            Text="{x:Bind AppSettings.FaceApiEndpoint, Mode=TwoWay}">
+                        </TextBox>
+
+                        <TextBlock 
+                            Text="Set Azure Face service key" 
+                            Grid.Row="5" 
+                            Grid.ColumnSpan="2"
+                            HorizontalAlignment="Left" 
+                            Height="32" 
+                            Margin="10,10,0,0" 
+                            VerticalAlignment="Bottom"
+                            TextAlignment="Left"/>
+
+                        <TextBox
+                            x:Name="AzureFaceServiceKey"
+                            Grid.Row="6" 
                             Grid.ColumnSpan="2"
                             Margin="10,0,10,0"
                             Text="{x:Bind AppSettings.FaceApiKey, Mode=TwoWay}">
                         </TextBox>
 
                         <TextBlock
-                            Text="Be aware that the image understanding capabilities of the FamilyNotes app use Microsoft Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Microsoft Face APIs to Microsoft, please visit the Microsoft Cognitive Services website at www.microsoft.com/cognitive-services, and use the 'Report Abuse' link at the bottom of the page to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839." 
-                            FontSize="9"
+                            Text="Be aware that the image understanding capabilities of the FamilyNotes app use Azure Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Azure Face service APIs to Microsoft, please visit the Azure Cognitive Services website at docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-support-options to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839." 
+                            FontSize="11"
                             TextWrapping="WrapWholeWords"
-                            Grid.Row="5"
+                            Grid.Row="9"
                             Grid.ColumnSpan="2"
                             Margin="15,0,15,0"
                         />
 
                         <TextBlock
                             Text="Delete all family notes and user data" 
-                            Grid.Row="6" 
+                            Grid.Row="7" 
                             Grid.ColumnSpan="2"
                             HorizontalAlignment="Left" 
                             Height="32"
@@ -349,7 +369,7 @@ THE SOFTWARE.
                         
                         <Button 
                             x:Name="DeleteAllButton"
-                            Grid.Row="7" 
+                            Grid.Row="8" 
                             Margin="10,0,0,0"
                             Tapped="DeleteAllButton_Tapped">
                             <SymbolIcon Symbol="Delete"></SymbolIcon>
