@@ -22,13 +22,13 @@ and the Microsoft Cognitive Services (Face API) to detect their presence and dis
 filtering based on facial recognition. While the app is open, users can naturally interact with it using speech (“Add note for Bob”). 
 If the app isn’t open, a user can easily launch it and interact with it using Cortana. 
 
-> Note - This sample is targeted and tested for Windows 10, version 2004 (10.0; Build 19569), and Visual Studio 2019. If you prefer, you can use project properties to retarget the project(s) to Windows 10, version 1809 (10.0; Build 17763), and/or open the sample with Visual Studio 2017.
+> Note - This sample is targeted and tested for Windows 10, version 2004 (10.0; Build 19041), and Visual Studio 2019. If you prefer, you can use project properties to retarget the project(s) to Windows 10, version 1809 (10.0; Build 17763), and/or open the sample with Visual Studio 2017.
 
 This sample runs on the Universal Windows Platform (UWP). 
 
 [![Using Ink, Voice, and Face Recognition in a UWP Video](Screenshots/Using_Ink_Voice_and_Face_Recognition_in_a_UWP_App_Video.PNG)](https://channel9.msdn.com/Blogs/One-Dev-Minute/Using-Ink-Voice-and-Face-Recognition-in-a-UWP-App "Channel 9 One Dev Minute video - Click to Watch")
 
-Be aware that the image understanding capabilities of the **FamilyNotes** app use Microsoft Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Microsoft Face APIs to Microsoft, please visit the Microsoft Cognitive Services website at www.microsoft.com/cognitive-services, and use the “Report Abuse” link at the bottom of the page to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839.
+Be aware that the image understanding capabilities of the **FamilyNotes** app use Microsoft Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Azure Face service to Microsoft, please visit the Microsoft Cognitive Services website at www.microsoft.com/cognitive-services, and use the “Report Abuse” link at the bottom of the page to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839.
 
 ![FamilyNotes MainPage](Screenshots/FamilyNotes.PNG)
 
@@ -38,7 +38,7 @@ The FamilyNotes app demonstrates:
 
 * Speech recognition and speech synthesis by using the [SpeechRecognizer](https://msdn.microsoft.com/library/windows/apps/windows.media.speechrecognition.speechrecognizer.aspx) and [SpeechSynthesizer](https://msdn.microsoft.com/library/windows/apps/windows.media.speechsynthesis.speechsynthesizer.aspx) classes.  
 * User detection using the [MediaCapture](https://msdn.microsoft.com/library/windows/apps/windows.media.capture.mediacapture.aspx) and [FaceDetectionEffect](https://msdn.microsoft.com/library/windows/apps/windows.media.core.facedetectioneffect.aspx) classes.  
-* User facial recognition using the [Microsoft Face API](http://www.microsoft.com/cognitive-services/en-us/face-api).
+* User facial recognition using the [Azure Face service](https://docs.microsoft.com/en-us/azure/cognitive-services/face/).
 * Activation through Cortana voice commands, defined in VoiceCommands.xml (a [VCD](https://msdn.microsoft.com/library/windows/apps/dn706593) file), using [VoiceCommands](https://msdn.microsoft.com/library/windows/apps/Windows.ApplicationModel.VoiceCommands.aspx) and [Activation](https://msdn.microsoft.com/en-us/library/windows/apps/windows.applicationmodel.activation.aspx) classes.
 * Pen input using the [InkCanvas API](https://msdn.microsoft.com/en-us/library/windows/apps/windows.ui.xaml.controls.inkcanvas.aspx)
 * JSON serialization using the [DataContractJsonSerializer](https://msdn.microsoft.com/en-us/library/system.runtime.serialization.json.datacontractjsonserializer.aspx) class.
@@ -69,9 +69,9 @@ The default project is FamilyNotes and you can Start Debugging (F5) or Start Wit
 
 * **User filtering by facial recognition requires:**
   * A front-facing camera or USB webcam.
-  * A subscription key for the Microsoft Face API. For information about getting a free trial key, see the Microsoft Cognitive Services site.
+  * A subscription key for the Azure Face service. For information about getting a free trial key, see the Azure Cognitive Services site.
   * A user created with a profile picture for your phase, or an user you want to be recognized.  
-    **Note:** The Microsoft Face API subscription key must be entered in the Settings menu of the app before facial recognition can be used. The settings menu is opened by clicking the gear button on the apps command bar.
+    **Note:** The Azure Face service subscription key and endpoint must be entered in the Settings menu of the app before facial recognition can be used. The settings menu is opened by clicking the gear button on the apps command bar.
 * **Speech recognition requires:**
   * A microphone and the appropriate settings enabled on the local machine.
 * **Cortana requires:**
@@ -95,13 +95,13 @@ Also, some additional discussion and information about the sample is available o
 
 If you are interested in code snippets and don’t want to browse or run the full sample, check out the following files for examples of some highlighted features:
 
-* [Settings.cs](FamilyNotes/Settings.cs) : Downloads the Bing image of the day and allows for app config such as storing the developer key for the Microsoft Face API.
+* [Settings.cs](FamilyNotes/Settings.cs) : Downloads the Bing image of the day and allows for app config such as storing the developer key for the Azure Face service.
 * [BindableInkCanvas.cs](FamilyNotes/Controls/BindableInkCanvas.cs) : An `InkCanvas` control with a bindable `InkStrokeContainer`.
 * [Utils.cs](FamilyNotes/Utils.cs) : Delete a directory and its contents.
 * [App.xaml.cs](FamilyNotes/App.xaml.cs) : Saves/loads the people and their notes. Demonstrates serialization and how to handle saving multiple `InkStrokeContainers` to a stream.
 * [AddPersonContentDialog.xaml.cs](FamilyNotes/AppDialogs/AddPersonContentDialog.xaml.cs) : Contains the add person dialog, which has an option to take a snapshot for a user when adding him or her. This picture is taken using the [CameraCaptureUI](https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.capture.cameracaptureui.aspx).
 * [UserPresence.cs](FamilyNotes/UserDetection/UserPresence.cs) : Contains the code that is responsible for taking pictures in the background. These pictures are then used for user identification.
-* [FacialSimilarity.cs](FamilyNotes/UserDetection/FacialSimilarity.cs) : Contains the code used to interact with the Microsoft Face APIs for the purpose of comparing a dynamically captured user image against a list of known users to obtain the most likely user present.
+* [FacialSimilarity.cs](FamilyNotes/UserDetection/FacialSimilarity.cs) : Contains the code used to interact with the Azure Face service for the purpose of comparing a dynamically captured user image against a list of known users to obtain the most likely user present.
 
 ## See also
 
