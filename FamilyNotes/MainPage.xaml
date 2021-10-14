@@ -1,4 +1,4 @@
-﻿  <!--
+﻿<!--
 Copyright (c) Microsoft Corporation.  All rights reserved.
 The MIT License (MIT)
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,433 +23,347 @@ THE SOFTWARE.
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="using:FamilyNotes"
       xmlns:converter="using:FamilyNotes.Converters"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      mc:Ignorable="d">
-    
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+      mc:Ignorable="d"
+      NavigationCacheMode="Disabled"
+      muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
+      SizeChanged="Page_SizeChanged">
+
     <Page.Resources>
-        <converter:BitmapToBrushConverter x:Key="BitmapToBrushConverter" />
+        <converter:BitmapToBrushConverter x:Key="BitmapToBrushConverter"/>
+        <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness>
     </Page.Resources>
 
-    <Page.BottomAppBar>
-        <CommandBar>
-            <CommandBar.PrimaryCommands>
-                <AppBarButton 
-                    x:Name="Tidy"
-                    Icon="AlignCenter"
-                    Label="Tidy notes"
-                    Tapped="TidyNotes" />
-                
-                <AppBarButton 
-                    x:Name="Add"
-                    Icon="AddFriend"
-                    Label="New person"
-                    Tapped="AddPersonTapped" />
-                
-                <AppBarButton 
-                    x:Name="FaceDetectionButton"
-                    Tapped="FaceDetectionButton_Tapped" 
-                    Label="Face detection">
-                    <Viewbox>
-                        <Grid>
-                            <SymbolIcon 
-                                Name="FaceDetectionDisabledIcon" 
-                                Symbol="WebCam" 
-                                Visibility="Visible"/>
-                            <SymbolIcon 
-                                Name="FaceDetectionEnabledIcon" 
-                                Symbol="Contact2" 
-                                Visibility="Collapsed"/>
-                        </Grid>
-                    </Viewbox>
-                </AppBarButton>
-                
-                <AppBarButton
-                    x:Name="SettingsButton"
-                    Icon="Setting"
-                    Label="Settings"
-                    Tapped="SettingsButton_Tapped" />
-                
-            </CommandBar.PrimaryCommands>
-        </CommandBar>
-    </Page.BottomAppBar>
-
-    <Grid Background="Black">
-        <Grid 
-            x:Name="rootGrid"
-            Width="Auto"
-            Height="Auto"
-            Background="{x:Bind AppSettings.FamilyNotesWallPaper, Converter={StaticResource BitmapToBrushConverter}, Mode=OneWay}" >
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="nameColumn" Width="auto" />
-                <ColumnDefinition x:Name="notesColumn" Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="80" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="80" />
-            </Grid.RowDefinitions>
-
-            <Grid
-                Grid.Column="0"
-                Grid.Row="0"
-                Grid.RowSpan="3"
-                Background="#4C000000">
-            </Grid>
-
-            <StackPanel
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="0"
-                Grid.ColumnSpan="2">
-                
-                <TextBlock
-                    x:Name="TextGreeting"
-                    Margin="10,10,6,0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
-                    FontSize="42.667"
-                    Opacity="1.0"
-                    Text="Good afternoon!"
-                    TextAlignment="Center"
-                    TextWrapping="Wrap" Foreground="White"  />
+    <Grid>
+        <Border x:Name="AppTitleBar" Height="48"
+                IsHitTestVisible="True"
+                VerticalAlignment="Top"
+                Background="Transparent"
+                Canvas.ZIndex="1">
+            <StackPanel Orientation="Horizontal" 
+                        Margin="12,0,0,0">
+                <Image Source="Assets/Square44x44Logo.png"
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Center" 
+                       Width="16" 
+                       Height="16"/>
+                <TextBlock x:Name="AppTitle"
+                           VerticalAlignment="Center"
+                           Margin="4,0,0,0"
+                           Style="{StaticResource CaptionTextBlockStyle}"/>
             </StackPanel>
+        </Border>
+        <TextBlock x:Name="TextGreeting"
+                   Style="{ThemeResource HeaderTextBlockStyle}"
+                   FontSize="36"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"
+                   Margin="120,0"/>
 
-            <Grid
-                Grid.Row="3"
-                Grid.Column="1">
+        <muxc:NavigationView x:Name="NavigationViewControl"
+                             IsTitleBarAutoPaddingEnabled="False"
+                             PaneDisplayMode="LeftCompact"
+                             CompactPaneLength="76"
+                             IsPaneToggleButtonVisible="False"
+                             IsBackButtonVisible="Collapsed"           
+                             MenuItemsSource="{x:Bind FamilyModel.Family}"
+                             ItemInvoked="NavigationViewControl_ItemInvoked"
+                             IsRightTapEnabled="True" 
+                             RightTapped="FamilyList_RightTap">
+            <muxc:NavigationView.MenuItemTemplate>
+                <DataTemplate x:DataType="local:Person">
+                    <StackPanel Margin="-8,4,0,0">
+                        <muxc:PersonPicture ProfilePicture="{x:Bind FaceImage,Mode=OneWay}" 
+                                            DisplayName="{x:Bind FriendlyName}"
+                                            VerticalAlignment="Top"
+                                            Width="56"/>
+                        <TextBlock Text="{x:Bind FriendlyName}"
+                                   TextAlignment="Center" 
+                                   VerticalAlignment="Bottom"
+                                   TextWrapping="WrapWholeWords"
+                                   Margin="0,0,0,8"/>
+                    </StackPanel>
+                </DataTemplate>
+            </muxc:NavigationView.MenuItemTemplate>
 
+            <muxc:NavigationView.PaneCustomContent>
+                <!-- Spacer to vertically align the list of people with the top of the content. -->
+                <Border x:Name="Spacer" Height="40">
+                    <muxc:TeachingTip x:Name="FamilyFilterTip"
+                                  Title="Filter by person"
+                                  Subtitle="You can filter notes by person, or right-click a person to leave them a note."
+                                  PreferredPlacement="TopLeft"
+                                  CloseButtonContent="Got it!"/>
+                </Border>
+            </muxc:NavigationView.PaneCustomContent>
+
+            <!-- Use PaneFooter instead of FooterMenuItems so that the MenuItemTemplate isn't applied. -->
+            <muxc:NavigationView.PaneFooter>
+                <muxc:NavigationViewItem Content="Help" 
+                                         Icon="Help"
+                                         ToolTipService.ToolTip="Help"
+                                         Tapped="NavigationViewItem_Tapped"/>
+            </muxc:NavigationView.PaneFooter>
+
+            <Grid Background="{x:Bind AppSettings.FamilyNotesWallPaper, Converter={StaticResource BitmapToBrushConverter}, Mode=OneWay}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBox
-                    Grid.Row="0"
-                    Height="32"
-                    Width="320"
-                    x:Name="CountBox"
-                    Text="{x:Bind _presence.FaceCount,Mode=OneWay}"
-                    Visibility="Collapsed"
-                    IsReadOnly="True"/>
+                <Frame x:Name="contentFrame">
+                    <local:NotesPanel x:Name="taskPanel" 
+                                      ItemsSource="{x:Bind FamilyModel.StickyNotes}" 
+                                      NoteInputModeChanged="TaskPanel_NoteInputModeChanged"/>
+                </Frame>
 
-                <TextBox
-                    Grid.Row="1" 
-                    Height="auto"
-                    TextAlignment="Center"
-                    TextWrapping="Wrap"
-                    Width="auto"
-                    x:Name="ImageWarningBox"
-                    Text="Face detection is enabled. Images are being captured and used for identity verification."
-                    Visibility="Collapsed"
-                    IsReadOnly="True"/>
-            </Grid>
+                <Border BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom" 
+                        Margin="0,0,0,24"
+                        CornerRadius="8" 
+                        BorderThickness="1">
+                    <CommandBar Background="{ThemeResource LayerFillColorDefaultBrush}">
+                        <CommandBar.PrimaryCommands>
+                            <AppBarButton x:Name="TidyNotesButton"
+                                          Icon="AlignCenter"
+                                          Label="Tidy notes"
+                                          Click="{x:Bind TidyNotes}"/>
+                            <AppBarButton x:Name="FullScreenButton"
+                                          Label="Full screen"
+                                          Icon="FullScreen"
+                                          Click="{x:Bind ToggleFullScreenMode}"/>
+                            <AppBarToggleButton x:Name="FaceDetectionButton"
+                                          Icon="WebCam"
+                                          Label="Face detection"
+                                          Checked="{x:Bind EnableFaceDetection}"
+                                          Unchecked="{x:Bind DisableFaceDetection}">
+                            </AppBarToggleButton>
+                            <AppBarToggleButton x:Name="VoiceCommandButton"
+                                                Icon="Microphone"
+                                                Label="Voice commands"
+                                                Checked="{x:Bind EnableVoiceCommands}"
+                                                Unchecked="{x:Bind DisableVoiceCommands}">
+                                <muxc:TeachingTip x:Name="VoiceCommandTip"
+                                          Target="{x:Bind VoiceCommandButton}"
+                                          Title="Use voice"
+                                          Subtitle="Turn on your microphone to use voice commands and dictate notes."
+                                          ActionButtonContent="Next tip"
+                                          CloseButtonContent="Got it!"/>
+                            </AppBarToggleButton>
+                            <AppBarButton x:Name="Add"
+                                          Icon="AddFriend"
+                                          Label="New person"
+                                          Click="{x:Bind AddPerson}">
+                                <muxc:TeachingTip x:Name="AddPersonTip"
+                                          Target="{x:Bind Add}"
+                                          Title="Add person"
+                                          Subtitle="Add family members to leave them notes."
+                                          ActionButtonContent="Next tip"
+                                          CloseButtonContent="Got it!"/>
+                            </AppBarButton>
+                            <AppBarButton x:Name="NewNoteButton"
+                                          Label="New note"
+                                          Icon="Add">
+                                <AppBarButton.Flyout>
+                                    <Flyout>
+                                        <ListView ItemsSource="{x:Bind FamilyModel.Family}"
+                                                  IsItemClickEnabled="True"
+                                                  ItemClick="ListView_ItemClick"
+                                                  SelectionMode="None"
+                                                  Header="New note for:">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate x:DataType="local:Person">
+                                                    <StackPanel>
+                                                        <PersonPicture ProfilePicture="{x:Bind FaceImage,Mode=OneWay}"
+                                                                       DisplayName="{x:Bind FriendlyName}"
+                                                                       Width="48" Margin="8,8,8,0"/>
+                                                        <TextBlock Text="{x:Bind FriendlyName}"
+                                                                   Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                   TextAlignment="Center"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Flyout>
+                                </AppBarButton.Flyout>
+                                <muxc:TeachingTip x:Name="NewNoteTip"
+                                          Target="{x:Bind NewNoteButton}"
+                                          Title="Create a note"
+                                          Subtitle="Add a new note for everyone, or for a specific person."
+                                          ActionButtonContent="Next tip"
+                                          CloseButtonContent="Got it!"/>
+                            </AppBarButton>
 
-            <StackPanel
-                Grid.Row="3"
-                Grid.RowSpan="2"
-                Margin="0,-60,0,-30">
-                <Grid
-                    HorizontalAlignment="Center"
-                    Margin="-15,0,0,0"
-                    Grid.Column="0"
-                    Tapped="NewNote_Tapped">
-                    
-                    <TextBlock
-                        FontFamily="Segoe UI Symbol"
-                        FontSize="60" 
-                        Foreground="#FFD8B100" 
-                        Margin="4,-10,0,0" >&#xE21d;
-                    </TextBlock>
-                    
-                    <TextBlock 
-                        FontFamily="Segoe UI Symbol"
-                        FontSize="40"
-                        Foreground="black"
-                        Margin="17,8,0,0" >&#xE119;
-                    </TextBlock>
-                </Grid>
-                
-                <TextBlock 
-                    Margin="0,0,0,0"
-                    Foreground="White"
-                    TextAlignment="Center">
-                    New note
-                </TextBlock>
-            </StackPanel>
+                        </CommandBar.PrimaryCommands>
+                    </CommandBar>
+                </Border>
 
-            <Grid 
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Margin="0,0,0,0">
+                <StackPanel Grid.Row="1">
+                    <muxc:InfoBar x:Name="MicrophoneWarningBar"
+                                  Severity="Warning" 
+                                  Title="Microphone is enabled."
+                                  IsOpen="False">
+                        <muxc:InfoBar.IconSource>
+                            <muxc:SymbolIconSource Symbol="Microphone" />
+                        </muxc:InfoBar.IconSource>
+                    </muxc:InfoBar>
 
-                <ListView
-                    HorizontalAlignment="Center"
-                    ItemsSource="{x:Bind FamilyModel.Family}"
-                    Tapped="FamilyList_Tapped"
-                    Holding="FamilyList_Holding" 
-                    RightTapped="FamilyList_RightTap"
-                    
-                    Margin="0,0,0,78" >
-                    
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:Person">
-                            
-                            <StackPanel
-                                Margin="0,10,0,0" 
-                                Opacity="1.0"  >
-
-                                <PersonPicture
-                                    Width="80"
-                                    Height="80"
-                                    ProfilePicture="{x:Bind FaceImage,Mode=OneWay}"
-                                    DisplayName="{x:Bind FriendlyName}">
-                                </PersonPicture>
-
-                                <TextBlock
-                                    TextAlignment="Center"
-                                    Foreground="White"
-                                    Text="{x:Bind FriendlyName}">
-                                </TextBlock>
-                                
-                                
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-
-            <local:NotesPanel
-                x:Name="taskPanel"
-                Grid.Row="0"
-                Grid.RowSpan="3"
-                Grid.Column="1"
-                Grid.ColumnSpan="2"
-                ItemsSource="{x:Bind FamilyModel.StickyNotes}"
-                Margin="0,8,8,30"
-                NoteInputModeChanged="taskPanel_NoteInputModeChanged">
-
-                <local:NotesPanel>
-                    <PerspectiveTransform3D></PerspectiveTransform3D>
-                </local:NotesPanel>
-            </local:NotesPanel>
-        </Grid>
-        
-        <Popup
-            x:Name="SettingsPopup"
-            IsLightDismissEnabled="True"
-            IsOpen="False">
-
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PaneThemeTransition Edge="Right" />
-                </TransitionCollection>
-            </Popup.ChildTransitions>
-
-            <Border
-                x:Name="rootPopupBorder"
-                Background="{StaticResource SystemControlBackgroundChromeMediumLowBrush}"
-                BorderBrush="{StaticResource SystemControlForegroundAccentBrush}"
-                BorderThickness="1">
-
-                <StackPanel>
-                    <TextBlock
-                        Style="{StaticResource TitleTextBlockStyle}" 
-                        Text="Family Notes"
-                        Margin="10,10,0,0"/>
-                    <TextBlock
-                        Style="{StaticResource BodyTextBlockStyle}"
-                        Text="Microsoft Corporation"
-                        Margin="10,0,0,10">
-                    </TextBlock>
-
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        
-                        <ToggleSwitch
-                            Grid.Row="0"
-                            Grid.ColumnSpan="2"
-                            Name="BingWallpaperToggle"
-                            Margin="10,10,0,0"
-                            Width="281"
-                            HorizontalAlignment="Left"
-                            Header="Use Bing wallpaper as background"
-                            IsOn="{x:Bind AppSettings.UseBingImageOfTheDay, Mode=TwoWay}" />
-
-                        <TextBlock 
-                            Text="Set camera device"
-                            Grid.Row="1" 
-                            Grid.ColumnSpan="2"
-                            HorizontalAlignment="Left" 
-                            Height="32" Width="140"
-                            Margin="10,10,0,0" 
-                            VerticalAlignment="Bottom"
-                            TextAlignment="Left"/>
-                        
-                        <Button
-                            x:Name="SetCameraButton"
-                            Grid.Row="2"
-                            Margin="10,0,0,0"
-                            Tapped="SetCameraDevice">
-                            <SymbolIcon Symbol="AttachCamera"></SymbolIcon>
-                        </Button>
-
-                        <TextBlock 
-                            Text="Set Azure Face service endpoint" 
-                            Grid.Row="3" 
-                            Grid.ColumnSpan="2"
-                            HorizontalAlignment="Left" 
-                            Height="32" 
-                            Margin="10,10,0,0" 
-                            VerticalAlignment="Bottom"
-                            TextAlignment="Left"/>
-                        
-                        <TextBox
-                            x:Name="AzureFaceServiceEndpoint"
-                            Grid.Row="4" 
-                            Grid.ColumnSpan="2"
-                            Margin="10,0,10,0"
-                            Text="{x:Bind AppSettings.FaceApiEndpoint, Mode=TwoWay}">
-                        </TextBox>
-
-                        <TextBlock 
-                            Text="Set Azure Face service key" 
-                            Grid.Row="5" 
-                            Grid.ColumnSpan="2"
-                            HorizontalAlignment="Left" 
-                            Height="32" 
-                            Margin="10,10,0,0" 
-                            VerticalAlignment="Bottom"
-                            TextAlignment="Left"/>
-
-                        <TextBox
-                            x:Name="AzureFaceServiceKey"
-                            Grid.Row="6" 
-                            Grid.ColumnSpan="2"
-                            Margin="10,0,10,0"
-                            Text="{x:Bind AppSettings.FaceApiKey, Mode=TwoWay}">
-                        </TextBox>
-
-                        <TextBlock
-                            Text="Be aware that the image understanding capabilities of the FamilyNotes app use Azure Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Azure Face service APIs to Microsoft, please visit the Azure Cognitive Services website at docs.microsoft.com/en-us/azure/cognitive-services/cognitive-services-support-options to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: http://go.microsoft.com/fwlink/?LinkId=521839." 
-                            FontSize="11"
-                            TextWrapping="WrapWholeWords"
-                            Grid.Row="9"
-                            Grid.ColumnSpan="2"
-                            Margin="15,0,15,0"
-                        />
-
-                        <TextBlock
-                            Text="Delete all family notes and user data" 
-                            Grid.Row="7" 
-                            Grid.ColumnSpan="2"
-                            HorizontalAlignment="Left" 
-                            Height="32"
-                            Margin="10,10,0,0" 
-                            VerticalAlignment="Bottom"
-                            TextAlignment="Left"/>
-                        
-                        <Button 
-                            x:Name="DeleteAllButton"
-                            Grid.Row="8" 
-                            Margin="10,0,0,0"
-                            Tapped="DeleteAllButton_Tapped">
-                            <SymbolIcon Symbol="Delete"></SymbolIcon>
-                        </Button>
-                    </Grid>
+                    <muxc:InfoBar x:Name="ImageWarningBar"
+                                  Severity="Warning" 
+                                  Title="Face detection is enabled."
+                                  Message="Images are being captured and used for identity verification." 
+                                  IsOpen="False" 
+                                  IsClosable="False">
+                        <muxc:InfoBar.IconSource>
+                            <muxc:SymbolIconSource Symbol="WebCam" />
+                        </muxc:InfoBar.IconSource>
+                        <TextBox x:Name="CountBox"
+                                 Text= "{x:Bind _presence.FaceCount,Mode=OneWay}"
+                                 Margin="0,-40,8,8"
+                                 Width="140"
+                                 HorizontalAlignment="Right"
+                                 IsReadOnly="True"/>
+                    </muxc:InfoBar>
                 </StackPanel>
-            </Border>
-        </Popup>
+            </Grid>
+        </muxc:NavigationView>
 
-        <Popup
-            x:Name="peoplePopup"
-            IsLightDismissEnabled="True"
-            IsOpen="False" >
-            
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PaneThemeTransition Edge="Left" />
-                </TransitionCollection>
-            </Popup.ChildTransitions>
+        <ContentDialog x:Name="SettingsDialog"
+                       Title="Settings"
+                       PrimaryButtonText="Close"
+                       Closed="SettingsDialog_Closed">
+            <ContentDialog.TitleTemplate>
+                <DataTemplate>
+                    <Grid Width="488">
+                        <StackPanel>
+                            <TextBlock Text="Family Notes"
+                                       Style="{StaticResource TitleTextBlockStyle}"/>
+                            <TextBlock Text="Microsoft Corporation"
+                                       Style="{StaticResource BodyTextBlockStyle}">
+                            </TextBlock>
+                        </StackPanel>
+                        <TextBlock Text="Settings"
+                                   Style="{StaticResource SubtitleTextBlockStyle}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ContentDialog.TitleTemplate>
+            <ScrollViewer Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="8">
+                <StackPanel x:Name="SettingsPanel">
+                    <StackPanel.Resources>
+                        <Style TargetType="Border">
+                            <Setter Target="Background" Value="{ThemeResource LayerFillColorDefaultBrush}"/>
+                            <Setter Target="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
+                            <Setter Target="BorderThickness" Value="1"/>
+                            <Setter Target="CornerRadius" Value="8"/>
+                            <Setter Target="Margin" Value="16,8"/>
+                            <Setter Target="HorizontalAlignment" Value="Left"/>
+                            <Setter Target="VerticalAlignment" Value="Top"/>
+                            <Setter Target="MinWidth" Value="460"/>
+                            <Setter Target="MinHeight" Value="60"/>
+                        </Style>
+                        <Style x:Key="LeftIconStyle" TargetType="SymbolIcon">
+                            <Setter Target="Margin" Value="12,0,0,0"/>
+                            <Setter Target="HorizontalAlignment" Value="Left"/>
+                        </Style>
+                        <Style x:Key="SectionHeaderStyle" TargetType="StackPanel">
+                            <Setter Target="Margin" Value="46,0,0,0"/>
+                            <Setter Target="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Border>
+                        <Grid>
+                            <SymbolIcon Symbol="SetLockScreen"
+                                        Style="{StaticResource LeftIconStyle}"/>
+                            <StackPanel Style="{StaticResource SectionHeaderStyle}">
+                                <TextBlock Text="Wallpaper"/>
+                                <TextBlock Text="Use Bing wallpaper as background"
+                                           VerticalAlignment="Center"
+                                           Style="{ThemeResource CaptionTextBlockStyle}"/>
+                            </StackPanel>
+                            <ToggleSwitch x:Name="BingWallpaperToggle"
+                                          IsOn="{x:Bind AppSettings.UseBingImageOfTheDay, Mode=TwoWay}"
+                                          HorizontalAlignment="Right"
+                                          Margin="0,0,-60,0"/>
+                        </Grid>
+                    </Border>
+                    <Border>
+                        <Grid>
+                            <SymbolIcon Symbol="AttachCamera"
+                                        Style="{StaticResource LeftIconStyle}"/>
+                            <StackPanel Style="{StaticResource SectionHeaderStyle}">
+                                <TextBlock Text="Set camera device"/>
+                                <TextBlock x:Name="DeviceText"
+                                           VerticalAlignment="Center"
+                                           Style="{ThemeResource CaptionTextBlockStyle}"/>
+                            </StackPanel>
+                            <Button x:Name="SetCameraButton"
+                                    Click="{x:Bind SetCameraDevice}"
+                                    Content="Choose camera"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,0,12,0"/>
+                        </Grid>
+                    </Border>
+                    <Border>
+                        <Grid>
+                            <StackPanel>
+                                <Grid>
+                                    <SymbolIcon Symbol="WebCam"
+                                                Style="{StaticResource LeftIconStyle}"/>
+                                    <StackPanel Style="{StaticResource SectionHeaderStyle}">
+                                        <TextBlock Text="Set Azure Face service key and endpoint"/>
+                                        <TextBlock Text="Face recognition requires Azure Face services."
+                                                   VerticalAlignment="Center"
+                                                   Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBox x:Name="AzureFaceServiceEndpoint"
+                                         Header="Set Azure Face service endpoint"                            
+                                         Margin="12"
+                                         Text="{x:Bind AppSettings.FaceApiEndpoint, Mode=TwoWay}"/>
+                                <TextBox x:Name="AzureFaceServiceKey"
+                                         Header="Set Azure Face service key"
+                                         Margin="12,0,12,12"
+                                         Text="{x:Bind AppSettings.FaceApiKey, Mode=TwoWay}"/>
+                                <TextBlock FontSize="11"
+                                           TextWrapping="WrapWholeWords"
+                                           Margin="16,0,16,4">
+                                    <Span><Run>Be aware that the image understanding capabilities of the FamilyNotes app use Azure Cognitive Services. Microsoft will receive the images and other data that you upload (via this app) for service improvement purposes. To report abuse of the Azure Face service APIs to Microsoft, please visit the Azure Cognitive Services website at </Run>
+                                    <Hyperlink NavigateUri="https://docs.microsoft.com/azure/cognitive-services/cognitive-services-support-options">docs.microsoft.com/azure/cognitive-services/cognitive-services-support-options</Hyperlink>
+                                    <Run> to contact Microsoft. For more information about Microsoft privacy policies please see the privacy statement here: </Run>
+                                    <Hyperlink NavigateUri="https://go.microsoft.com/fwlink/?LinkId=521839">https://go.microsoft.com/fwlink/?LinkId=521839</Hyperlink>.
+                                    </Span>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Border>
+                        <Grid>
+                            <SymbolIcon Symbol="Delete"
+                                        Style="{StaticResource LeftIconStyle}"/>
+                            <StackPanel Style="{StaticResource SectionHeaderStyle}">
+                                <TextBlock Text="Delete all"/>
+                                <TextBlock Text="Delete all family notes and user data."
+                                           VerticalAlignment="Center"
+                                           Style="{ThemeResource CaptionTextBlockStyle}"/>
+                            </StackPanel>
+                            <Button x:Name="DeleteAllButton"
+                                    Click="{x:Bind DeleteAll}"
+                                    Content="Delete all" 
+                                    HorizontalAlignment="Right"
+                                    Margin="0,0,12,0">
+                            </Button>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </ContentDialog>
 
-            <Border
-                x:Name="rootPopupBorder2"
-                BorderBrush="{ThemeResource AppBarItemPointerOverForegroundThemeBrush}"
-                BorderThickness="1" CornerRadius="0" Margin="-8,0,0,0">
-                
-                <Border.Background>
-                    <LinearGradientBrush
-                        EndPoint="0.5,1"
-                        StartPoint="0.5,0">
-                        <GradientStop
-                            Color="#FF22222C"
-                            Offset="0.52"/>
-                        <GradientStop
-                            Color="Black"
-                            Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-
-                <Grid  HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <ListView
-                        ItemsSource="{x:Bind FamilyModel.Family}"
-                        Tapped="PeoplePicker_Tapped"
-                        Grid.ColumnSpan="2">
-
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"></StackPanel>
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="local:Person">
-                                <StackPanel
-                                    Margin="8,10,0,0"
-                                    Opacity="1.0">
-                                    
-                                    <PersonPicture
-                                    Width="80"
-                                    Height="80"
-                                    ProfilePicture="{x:Bind FaceImage,Mode=OneWay}"
-                                    DisplayName="{x:Bind FriendlyName}">
-                                    </PersonPicture>
-                                    
-                                    
-
-                                    <TextBlock
-                                        TextAlignment="Center"
-                                        Foreground="White"
-                                        Text="{x:Bind FriendlyName}">
-                                    </TextBlock>
-                                    
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
-            </Border>
-        </Popup>
-        
+        <!-- MediaElement for speech. -->
         <MediaElement x:Name="_media" AutoPlay="False"/>
-        
     </Grid>
 </Page>

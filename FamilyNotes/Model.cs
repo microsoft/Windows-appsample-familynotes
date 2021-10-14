@@ -165,7 +165,7 @@ namespace FamilyNotes
         /// </summary>
         public void CreateDefaultFamily()
         {
-            AddPersonAsync(App.EVERYONE, "/Assets/face_1.png"); // Note: "Everyone" is special, and should always be added.
+            AddPersonAsync(App.EVERYONE, "/Assets/family.png"); // Note: "Everyone" is special, and should always be added.
             // You can add other default family members here.
         }
 

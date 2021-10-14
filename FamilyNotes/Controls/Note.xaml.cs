@@ -23,10 +23,13 @@
 //  ---------------------------------------------------------------------------------
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using Windows.UI;
+using Windows.UI.Composition;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
@@ -44,13 +47,12 @@ namespace FamilyNotes
         public Note()
         {
             InitializeComponent();
+            CreateShadows();
 
             // Set up manipulation events.
             ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
             ManipulationDelta += Note_ManipulationDelta;
             ManipulationStarted += Note_ManipulationStarted;
-            Tapped += Note_Tapped;
-            DoubleTapped += Note_DoubleTapped;
 
             // Create the render transform.
             _compositeTransform = new CompositeTransform();
@@ -64,15 +66,12 @@ namespace FamilyNotes
                 new Random().Next(_notePositionMin, _notePositionMax),
                 new Random().Next(_notePositionMin, _notePositionMax));
 
-            // By default, make the note ready for text.
-            // Should add code to test if it's created with a pen
-            // and should then default to ink.
+            // Accept ink input from touch, mouse, and pen.
             containerForInk.InkPresenter.InputDeviceTypes =
                 Windows.UI.Core.CoreInputDeviceTypes.Touch |
                 Windows.UI.Core.CoreInputDeviceTypes.Mouse |
                 Windows.UI.Core.CoreInputDeviceTypes.Pen;
         }
-
 
         /// <summary>
         /// Gets or sets the <see cref="StickyNote"/> instance that
@@ -97,7 +96,7 @@ namespace FamilyNotes
                 new PropertyMetadata(false, NoteBusinessObjectPropertyChanged));
 
         private static void NoteBusinessObjectPropertyChanged(DependencyObject dependencyObject,
-                                           DependencyPropertyChangedEventArgs ea)
+            DependencyPropertyChangedEventArgs ea)
         {
             Note instance = dependencyObject as Note;
             StickyNote note = ea.NewValue as StickyNote;
@@ -105,7 +104,7 @@ namespace FamilyNotes
         }
 
         /// <summary>
-        /// Gets the kind of input that's active on the current <see cref="Note"/> control.
+        /// Gets or sets the kind of input that's active on the current <see cref="Note"/> control.
         /// </summary>
         public NoteInputMode InputMode
         {
@@ -114,7 +113,7 @@ namespace FamilyNotes
                 return this._inputMode;
             }
 
-            private set
+            set
             {
                 if (SetProperty(ref _inputMode, value))
                 {
@@ -130,7 +129,7 @@ namespace FamilyNotes
         private NoteInputMode _inputMode = NoteInputMode.Default;
 
         /// <summary>
-        /// Gets a value indicating whether the current <see cref="Note"/> 
+        /// Gets a value that indicates whether the current <see cref="Note"/> 
         /// control can change to accepting ink input.
         /// </summary>
         public bool CanEnterInkMode
@@ -142,7 +141,7 @@ namespace FamilyNotes
         }
 
         /// <summary>
-        /// Gets a value indicating whether the current <see cref="Note"/> 
+        /// Gets a value that indicates whether the current <see cref="Note"/> 
         /// control can change to accepting speech input.
         /// </summary>
         public bool CanEnterSpeechMode
@@ -154,7 +153,7 @@ namespace FamilyNotes
         }
 
         /// <summary>
-        /// Gets a value indicating whether the current <see cref="Note"/> 
+        /// Gets a value that indicates whether the current <see cref="Note"/> 
         /// control can change to accepting keyboard input.
         /// </summary>
         public bool CanEnterTypingMode
@@ -203,22 +202,30 @@ namespace FamilyNotes
             _compositeTransform.TranslateY = y;
         }
 
-
-        private void Note_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private void UpdateNoteExpansion()
         {
-            // When the note is double tapped, expand or collapse it to take up less space.
+            // When the note is double tapped or when the button is pressed,
+            // expand or collapse it to take up less space.
             if (TheNote.Height == _noteHeightCollapsed)
             {
-                TheNote.Height = _noteHeight;
-                NoteBottomSection.Visibility = Visibility.Visible;
-                DropShadow.Height = _dropShadowHeight;
+                ExpandNote();
             }
             else
             {
-                TheNote.Height = _noteHeightCollapsed;
-                DropShadow.Height = _dropShadowHeightCollapsed;
-                NoteBottomSection.Visibility = Visibility.Collapsed;
+                CollapseNote();
             }
+        }
+
+        public void ExpandNote()
+        {
+            TheNote.Height = _noteHeight;
+            NoteBottomSection.Visibility = Visibility.Visible;
+        }
+
+        public void CollapseNote()
+        {
+            TheNote.Height = _noteHeightCollapsed;
+            NoteBottomSection.Visibility = Visibility.Collapsed;
         }
 
         private void BringCurrentNoteToFront()
@@ -245,12 +252,6 @@ namespace FamilyNotes
             }
         }
 
-        private void Note_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            NotesCanvas parent = CanvasControl;
-            parent.BringNoteToFront(this);
-        }
-
         private void Note_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
             BringCurrentNoteToFront();
@@ -258,7 +259,7 @@ namespace FamilyNotes
 
         private void Note_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            // Move the note around the screen
+            // Move the note around the screen.
             _compositeTransform.TranslateX += e.Delta.Translation.X;
             _compositeTransform.TranslateY += e.Delta.Translation.Y;
 
@@ -281,18 +282,66 @@ namespace FamilyNotes
 
         private void NoteTypeText_Click(object sender, RoutedEventArgs e)
         {
-            InputMode = NoteInputMode.Text;
-        }
-
-        private void NoteTypeInk_Click(object sender, RoutedEventArgs e)
-        {
-            InputMode = NoteInputMode.Ink;
+            GoToTextMode(NoteInputMode.Text, true);
         }
 
         private void NoteTypeVoice_Click(object sender, RoutedEventArgs e)
         {
+            GoToTextMode(NoteInputMode.Dictation, false);
             containerForText.PlaceholderText = "Dictate your note!";
-            InputMode = NoteInputMode.Dictation;
+        }
+
+        private void GoToTextMode(NoteInputMode mode, bool setFocus)
+        {
+            if (mode != NoteInputMode.Text && mode != NoteInputMode.Dictation)
+            {
+                return;
+            }
+            InputMode = mode;
+
+            VisualStateManager.GoToState(this, "TextInput", true);
+
+            if (setFocus)
+            {
+                _ = containerForText.Focus(FocusState.Keyboard);
+            }
+
+            // Move text controls to primary commands and
+            // ink controls to secondary commands in the command bar.
+            if (NoteCommandBar.PrimaryCommands.Contains(NoteTypeInk))
+            {
+                NoteCommandBar.PrimaryCommands.Remove(NoteTypeInk);
+                NoteCommandBar.SecondaryCommands.Add(NoteTypeInk);
+            }
+            if (NoteCommandBar.SecondaryCommands.Contains(NoteTypeText))
+            {
+                NoteCommandBar.SecondaryCommands.Remove(NoteTypeText);
+                NoteCommandBar.PrimaryCommands.Add(NoteTypeText);
+            }
+
+            containerForInk.Strokes.Clear();
+        }
+
+        private void GoToInkMode()
+        {
+            InputMode = NoteInputMode.Ink;
+
+            VisualStateManager.GoToState(this, "InkInput", true);
+
+            // Move ink controls to primary commands and
+            // text controls to secondary commands in the command bar.
+            if (NoteCommandBar.PrimaryCommands.Contains(NoteTypeText))
+            {
+                NoteCommandBar.PrimaryCommands.Remove(NoteTypeText);
+                NoteCommandBar.SecondaryCommands.Add(NoteTypeText);
+            }
+            if (NoteCommandBar.SecondaryCommands.Contains(NoteTypeInk))
+            {
+                NoteCommandBar.SecondaryCommands.Remove(NoteTypeInk);
+                NoteCommandBar.PrimaryCommands.Add(NoteTypeInk);
+            }
+
+            containerForText.Text = string.Empty;
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
@@ -305,6 +354,8 @@ namespace FamilyNotes
             // The text container was tapped. 
             // Ensure that the note is brought to foreground.
             BringCurrentNoteToFront();
+
+            GoToTextMode(NoteInputMode.Text, false);
         }
 
         private void ContainerForText_TextChanged(object sender, TextChangedEventArgs e)
@@ -316,6 +367,17 @@ namespace FamilyNotes
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             BringCurrentNoteToFront();
+
+            // If the note has existing content, go to
+            // text or ink mode as appropriate.
+            if (!string.IsNullOrEmpty(containerForText.Text))
+            {
+                GoToTextMode(NoteInputMode.Text, false);
+            }
+            else if (containerForInk.Strokes.GetStrokes().Count > 0)
+            {
+                GoToInkMode();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -325,7 +387,7 @@ namespace FamilyNotes
         }
 
         protected bool SetProperty<T>(
-            ref T storage, 
+            ref T storage,
             T value,
             [CallerMemberName] String propertyName = null)
         {
@@ -335,14 +397,38 @@ namespace FamilyNotes
             return true;
         }
 
+        void CreateShadows()
+        {
+            // Create a drop shadow.
+            var shadowColor = (Color)App.Current.Resources["NoteShadowColor"];
+            var hostVisual = ElementCompositionPreview.GetElementVisual(ShadowRect);
+            Compositor compositor = hostVisual.Compositor;
+
+            var dropShadow = compositor.CreateDropShadow();
+            dropShadow.Color = shadowColor;
+            dropShadow.BlurRadius = 16.0f;
+            dropShadow.Offset = new Vector3(4.0f, 4.0f, 0.0f);
+            dropShadow.Opacity = 20.0f;
+
+            // Create a Visual to hold the shadow.
+            var shadowVisual = compositor.CreateSpriteVisual();
+            shadowVisual.Size = TheNote.RenderSize.ToVector2();
+            shadowVisual.Size = new Vector2(380, 280);
+            shadowVisual.Shadow = dropShadow;
+
+            // Add the shadow as a child of the host in the visual tree.
+            ElementCompositionPreview.SetElementChildVisual(ShadowRect, shadowVisual);
+
+            // Make sure size of shadow host and shadow visual always stay in sync.
+            var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+            bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
+            shadowVisual.StartAnimation("Size", bindSizeAnimation);
+        }
 
         // Tracks the location of the note control.
         private CompositeTransform _compositeTransform;
-
         private readonly int _noteHeight = 300;
-        private readonly int _noteHeightCollapsed = 58;
-        private readonly int _dropShadowHeight = 300;
-        private readonly int _dropShadowHeightCollapsed = 58;
+        private readonly int _noteHeightCollapsed = 32;
         private readonly int _zOrderTop = 100;
         private readonly int _notePositionMin = 50;
         private readonly int _notePositionMax = 300;

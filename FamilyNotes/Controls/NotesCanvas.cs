@@ -109,6 +109,35 @@ namespace FamilyNotes
         }
 
         /// <summary>
+        /// Arranges <see cref="Note"/> controls within the bounds of the canvas.
+        /// </summary>
+        public void ConstrainNotesToCanvas()
+        {
+            // Each child control is a ContentPresenter that's wrapping a Note control.
+            var children = Children;
+
+            double maxX = ActualWidth - 400;
+            double maxY = ActualHeight - 300;
+            double newX = maxX;
+            double newY = maxY;
+
+            foreach (var noteContentPresenter in children)
+            {
+                Note n = GetVisualChild<Note>(noteContentPresenter);
+                CompositeTransform ct = n.RenderTransform as CompositeTransform;
+
+                if (ct.TranslateX > maxX)
+                {
+                    ct.TranslateX = newX -= 24;
+                }
+                if (ct.TranslateY > maxY)
+                {
+                    ct.TranslateY = newY -= 24;
+                }
+            }
+        }
+
+        /// <summary>
         /// Highlights the <see cref="Note"/> controls for the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="person">The person to highlight notes for.</param>
@@ -132,13 +161,15 @@ namespace FamilyNotes
                     n.Opacity = _opacityTop;
                     ct.ScaleX = _noteScaleTopX;
                     ct.ScaleY = _noteScaleTopY;
+                    n.ExpandNote();
                 }
                 else
                 {
                     // Make note a little transparent, ideally push it back into the z-dimension.
                     n.Opacity = _opacityMid;
                     ct.ScaleX = _noteScaleMidX;
-                    ct.ScaleY = _noteScaleMidY;
+                    ct.ScaleY = _noteScaleMidY; 
+                    n.CollapseNote();
                 }
             }
         }

@@ -18,21 +18,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
     <ContentDialog
-    x:Class="FamilyNotes.DeleteConfirmationDialog"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:FamilyNotes"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Title="Delete users and note data"
-    PrimaryButtonText="OK"
-    SecondaryButtonText="Cancel"
-    PrimaryButtonClick="Delete_ConfirmButtonClick"
-    SecondaryButtonClick="Delete_CancelButtonClick" Width="524.145">
-
-    <Grid>
-        <TextBlock Margin="0,20,10,0" TextWrapping="WrapWholeWords" FontWeight="ExtraBlack">
-            This action is not reversable. All users, and their data, will be removed. Only settings are retained.</TextBlock>
-    </Grid>
+        x:Class="FamilyNotes.DeleteConfirmationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:FamilyNotes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Delete users and note data?"
+        Content="This action is not reversable. All users, and their data, will be removed. Only settings are retained."
+        PrimaryButtonText="Delete"
+        SecondaryButtonText="Cancel"
+        PrimaryButtonClick="Delete_ConfirmButtonClick"
+        SecondaryButtonClick="Delete_CancelButtonClick">
+    <ContentDialog.Resources>
+        <Style TargetType="local:DeleteConfirmationDialog" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
+    </ContentDialog.Resources>
 </ContentDialog>

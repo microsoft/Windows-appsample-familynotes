@@ -77,6 +77,19 @@ namespace FamilyNotes
             }
         }
 
+        /// <summary>
+        /// Configures the camera and enables face detection.
+        /// </summary>
+        public async Task<bool> DisableFaceDetection()
+        {
+            if (_mediaCapture != null)
+            {
+                await CleanupCameraAsync();
+                return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Keeps track of whether we are using the default camera device to capture images.

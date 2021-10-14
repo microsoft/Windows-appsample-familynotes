@@ -76,6 +76,14 @@ namespace FamilyNotes
         }
 
         /// <summary>
+        /// Arranges <see cref="Note"/> controls within the bounds of the canvas.
+        /// </summary>
+        public void ConstrainNotesToCanvas()
+        {
+            CanvasControl.ConstrainNotesToCanvas();
+        }
+
+        /// <summary>
         /// Highlights the <see cref="Note"/> controls for the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="person">The person to highlight notes for.</param>

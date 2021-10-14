@@ -24,46 +24,121 @@ THE SOFTWARE.
     xmlns:local="using:FamilyNotes"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:converter="using:FamilyNotes.Converters"
     x:Name="NoteRoot"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400" Loaded="UserControl_Loaded">
-
+    d:DesignWidth="400" 
+    Loaded="UserControl_Loaded"
+    Tapped="{x:Bind BringCurrentNoteToFront}"
+    DoubleTapped="{x:Bind UpdateNoteExpansion}">
     <UserControl.Resources>
         <converter:InputModeConverter x:Key="InputModeConverter" />
     </UserControl.Resources>
 
-    <Grid x:Name ="TheNote" Background="#FFF6E8BF" Height="300" Width="400" CornerRadius="8">
+    <Grid>
+        <Rectangle x:Name="ShadowRect" Canvas.ZIndex="-1"/>
 
-        <Border x:Name="DropShadow" Width="400" Height="300" Opacity="0.3" RenderTransformOrigin="0,0" BorderThickness="1,1,8,8" BorderBrush="Black" CornerRadius="8"   >
-            <Border.RenderTransform>
-                <CompositeTransform ScaleX="1.02" ScaleY="1.02"  />
-            </Border.RenderTransform>
-        </Border>
+        <Grid x:Name ="TheNote"
+              Background="{ThemeResource NoteBackgroundBrush}"
+              Height="300"
+              Width="400"
+              CornerRadius="8"
+              BorderThickness="1" 
+              BorderBrush="{ThemeResource SystemControlHighlightAltBaseLowBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Grid x:Name="NoteTopSection">
-            <TextBlock x:Name="noteTitle" HorizontalAlignment="Center" Margin="48,7,88,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="264" Height="29" Text="{x:Bind DisplayName}" Foreground="Black" FontSize="18.667" FontWeight="Bold"/>
+            <Grid x:Name="NoteTopSection">
+                <TextBlock x:Name="noteTitle" 
+                           Text="{x:Bind DisplayName}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" 
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top" 
+                           Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <Button Content="&#xE108;"
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Click="{x:Bind UpdateNoteExpansion}"
+                        VerticalAlignment="Top" HorizontalAlignment="Right"
+                        Height="32"/>
+            </Grid>
+            <Grid x:Name="NoteBottomSection" Grid.Row="1">
+                <TextBox x:Name="containerForText" 
+                     TextWrapping="Wrap" 
+                     VerticalAlignment="Stretch" 
+                     Margin="4,4,4,52"
+                     PlaceholderText="{Binding Path=NotePlaceholderText, Mode=TwoWay}"  
+                     GotFocus="ContainerForText_GotFocus" 
+                     TextChanged="ContainerForText_TextChanged" 
+                     Text="{Binding Path=NoteText, Mode=TwoWay}" 
+                     SelectionHighlightColor="#FF6588A4" 
+                     FontSize="18" 
+                     BorderThickness="0" 
+                     Visibility="{x:Bind InputMode, Converter={StaticResource InputModeConverter}, ConverterParameter=Text, Mode=OneWay}" 
+                     AcceptsReturn="True"
+                     Background="Transparent"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
 
-            <Button x:Name="buttonClose"  Content="&#x2716;"   HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Click="ButtonClose_Click" FontFamily="Segoe UI Symbol" FontSize="18.667" RenderTransformOrigin="0,0" Height="36" Background="#00F6E8BF" />
+                <local:BindableInkCanvas x:Name="containerForInk"
+                                     Strokes="{Binding Path=Ink, Mode=TwoWay}"
+                                     Height="216"  Width="380"
+                                     Margin="4" 
+                                     VerticalAlignment="Top"
+                                     Tapped="{x:Bind BringCurrentNoteToFront}"
+                                     Visibility="{x:Bind InputMode, Converter={StaticResource InputModeConverter}, ConverterParameter=Ink, Mode=OneWay}"/>
+
+                <CommandBar x:Name="NoteCommandBar" 
+                            VerticalAlignment="Bottom">
+                    <AppBarButton x:Name="NoteTypeVoice" 
+                                  Label="Dictate" Icon="Microphone" 
+                                  Click="NoteTypeVoice_Click"  
+                                  IsEnabled="{x:Bind CanEnterSpeechMode, Mode=OneWay}"/>
+                    <AppBarButton x:Name="NoteTypeText" 
+                                  Label="Text" Icon="Character" 
+                                  Click="NoteTypeText_Click" 
+                                  IsEnabled="{x:Bind CanEnterTypingMode, Mode=OneWay}"/>
+
+                    <AppBarElementContainer x:Name="InkTools" Visibility="Collapsed">
+                        <InkToolbar TargetInkCanvas="{x:Bind containerForInk}" VerticalAlignment="Top"/>
+                    </AppBarElementContainer>
+                    <AppBarButton x:Name="NoteTypeInk" 
+                                  Label="Ink" Icon="Edit"
+                                  Click="{x:Bind GoToInkMode}" 
+                                  IsEnabled="{x:Bind CanEnterInkMode, Mode=OneWay}"/>
+
+                    <CommandBar.SecondaryCommands>
+                        <AppBarButton x:Name="buttonClose"  
+                                      Icon="Delete" Label="Delete"
+                                      FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                      Click="ButtonClose_Click"/>
+                    </CommandBar.SecondaryCommands>
+                </CommandBar>
+            </Grid>
         </Grid>
-        <Grid x:Name="NoteBottomSection" >
-
-            <StackPanel Width="380" Height="32" Orientation="Horizontal" VerticalAlignment="Bottom" CornerRadius="4" Margin="10,0,10,10" HorizontalAlignment="Stretch">
-                <Button x:Name="NoteTypeText" Content="Text" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" Width="126" Click="NoteTypeText_Click" Foreground="White" Background="#FFAAA4A4" IsEnabled="{Binding ElementName=NoteRoot, Path=CanEnterTypingMode}" />
-                <Button x:Name="NoteTypeInk" Content="Ink" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Width="126" Height="32" Click="NoteTypeInk_Click" Foreground="White" IsEnabled="{Binding ElementName=NoteRoot, Path=CanEnterInkMode}" Background="#FFAAA4A4" BorderBrush="#7F545050" BorderThickness="1,0" />
-                <Button x:Name="NoteTypeVoice" Content="Dictate" HorizontalAlignment="Stretch"  VerticalAlignment="Center" Width="126" Height="32" Click="NoteTypeVoice_Click"  Foreground="White" Background="#FFAAA4A4" IsEnabled="{Binding ElementName=NoteRoot, Path=CanEnterSpeechMode}"  />
-            </StackPanel>
-            <TextBox x:Name="containerForText" HorizontalAlignment="Left" Margin="10,52 ,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="199" Width="380" PlaceholderText="{Binding Path=NotePlaceholderText, Mode=TwoWay}"  
-                     GotFocus="ContainerForText_GotFocus" TextChanged="ContainerForText_TextChanged" Text="{Binding Path=NoteText, Mode=TwoWay}" Foreground="Black" SelectionHighlightColor="#FF6588A4" FontSize="21.333" BorderThickness="0" 
-                     Visibility="{x:Bind InputMode, Converter={StaticResource InputModeConverter}, ConverterParameter=Text, Mode=OneWay}" AcceptsReturn="True" Background="#FFF6E8BF"/>
-            <local:BindableInkCanvas x:Name="containerForInk" 
-                Strokes="{Binding Path=Ink, Mode=TwoWay}" 
-                HorizontalAlignment="Left" Height="199" Margin="10,58,0,0" VerticalAlignment="Top" Width="380" 
-                Visibility="{x:Bind InputMode, Converter={StaticResource InputModeConverter}, ConverterParameter=Ink, Mode=OneWay}"/>
-        </Grid>
-
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Normal">
+                    <VisualState.Setters>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="TextInput">
+                    <VisualState.Setters>
+                        <Setter Target="NoteTypeInk.Label" Value="Switch to ink"/>
+                        <Setter Target="InkTools.Visibility" Value="Collapsed"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="InkInput">
+                    <VisualState.Setters>
+                        <Setter Target="NoteTypeText.Label" Value="Switch to text"/>
+                        <Setter Target="NoteTypeVoice.Visibility" Value="Collapsed"/>
+                        <Setter Target="InkTools.Visibility" Value="Visible"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
-
-
 </UserControl>

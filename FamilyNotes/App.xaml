@@ -22,9 +22,32 @@ THE SOFTWARE.
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:FamilyNotes"
-    RequestedTheme="Light">
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
     <Application.Resources>
-        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+        <controls:XamlControlsResources>
+            <controls:XamlControlsResources.MergedDictionaries>
+                <!-- Other app resources here -->
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Light">
+                            <SolidColorBrush x:Key="AccentBackgroundColor" Color="LightSteelBlue"/>
+                            <Color x:Key="NoteShadowColor">#99000000</Color>
+                            <Color x:Key="NoteBackgroundColor">#FFF6E8BF</Color>
+                            <SolidColorBrush x:Key="NoteBackgroundBrush" Color="{StaticResource NoteBackgroundColor}"/>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="Dark">
+                            <SolidColorBrush x:Key="AccentBackgroundColor" Color="SteelBlue"/>
+                            <Color x:Key="NoteShadowColor">#99000000</Color>
+                            <Color x:Key="NoteBackgroundColor">#FF333333</Color>
+                            <SolidColorBrush x:Key="NoteBackgroundBrush" Color="{StaticResource NoteBackgroundColor}"/>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="HighContrast">
+                            <SolidColorBrush x:Key="NoteBackgroundBrush" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
+                </ResourceDictionary>
+            </controls:XamlControlsResources.MergedDictionaries>
+        </controls:XamlControlsResources>
     </Application.Resources>
 
 </Application>

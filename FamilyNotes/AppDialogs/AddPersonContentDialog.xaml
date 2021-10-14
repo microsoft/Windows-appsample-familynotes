@@ -31,6 +31,9 @@ THE SOFTWARE.
                    mc:Ignorable="d" 
                    Height="724.719" 
                    IsPrimaryButtonEnabled="False">
+    <ContentDialog.Resources>
+        <Style TargetType="local:AddPersonContentDialog" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
+    </ContentDialog.Resources>
     <ContentDialog.TitleTemplate>
         <DataTemplate>
             <StackPanel Orientation="Horizontal">

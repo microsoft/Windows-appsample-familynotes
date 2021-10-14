@@ -198,7 +198,7 @@ namespace FamilyNotes
             }
 
             // When we aren't using the bing image of the day, default to the brush steel background appearance
-            FamilyNotesWallPaper = new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg"));
+            FamilyNotesWallPaper = null; // new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg"));
         }
 
         private enum Resolution { Unspecified, _800x600, _1024x768, _1366x768, _1920x1080, _1920x1200 }
@@ -231,7 +231,7 @@ namespace FamilyNotes
         private string _defaultCameraID;
         private string _faceApiKey = "";
         private string _faceApiEndpoint = "";
-        private BitmapImage _familyNotesWallPaper = new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg")); // Before the user has decided on the background, use the brushed steel.
+        private BitmapImage _familyNotesWallPaper = null; // new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg")); // Before the user has decided on the background, use the brushed steel.
         private const string WALLPAPER = "UseBingImageOfTheDay";
         private const string MICRFOSOFT_FACESERVICE_ENDPOINT = "MicrosoftFaceServiceEndpoint";
         private const string MICRFOSOFT_FACESERVICE_KEY = "MicrosoftFaceServiceKey";

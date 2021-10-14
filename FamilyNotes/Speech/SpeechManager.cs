@@ -118,8 +118,9 @@ namespace FamilyNotes
         /// </summary>
         /// <param name="mode">The recognition mode.</param>
         /// <returns>Void</returns>
-        public async Task SetRecognitionMode(SpeechRecognitionMode mode)
+        public async Task<bool> SetRecognitionMode(SpeechRecognitionMode mode)
         {
+            bool success = true;
             if (mode != RecognitionMode)
             {
                 RecognitionMode = mode;
@@ -130,12 +131,18 @@ namespace FamilyNotes
                 }
                 else
                 {
-                    await StartContinuousRecognition();
+                    if (!await StartContinuousRecognition())
+                    {
+                        success = false;
+                        mode = SpeechRecognitionMode.Default;
+                    }
                 }
+                OnModeChanged(new EventArgs());
             }
+            return success;
         }
 
-        public async Task StartContinuousRecognition()
+        public async Task<bool> StartContinuousRecognition()
         {
             // Compiling a new grammar is potentially a high-latency operation,
             // and it's easy for various threads to call this method concurrently,
@@ -143,9 +150,11 @@ namespace FamilyNotes
             // allows only one thread at a time to execute this code path.
             await Mutex.WaitAsync();
 
-            // End the previous speech recognition session.
-            await EndRecognitionSession();
-
+            if (IsInRecognitionSession)
+            {
+                // End the previous speech recognition session.
+                await EndRecognitionSession();
+            }
 #if VERBOSE_DEBUG
             Debug.WriteLine( 
                 "SpeechManager: Starting recognition session: {0}", 
@@ -154,10 +163,26 @@ namespace FamilyNotes
 
             try
             {
-                // If no mic is available, do nothing.
+                // If no mic is available, notify the user and reset mode to default.
                 if (!await IsMicrophoneAvailable())
                 {
-                    return;
+                    if (RecognitionMode == SpeechRecognitionMode.CommandPhrases ||
+                        RecognitionMode == SpeechRecognitionMode.Dictation)
+                    {
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("Microphone is not available.");
+
+                        messageDialog.Commands.Add(new UICommand("Go to settings...", async (command) =>
+                        {
+                            bool result = await Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-microphone"));
+
+                        }));
+                        messageDialog.Commands.Add(new UICommand("Close", (command) => { }));
+                        await messageDialog.ShowAsync();
+                    }
+
+                    RecognitionMode = SpeechRecognitionMode.Default;
+                    Mutex.Release();
+                    return false;
                 }
 
                 // Compile the grammar, based on the value of the RecognitionMode property.
@@ -172,9 +197,6 @@ namespace FamilyNotes
 
                 // Keep track of the the recognition session's state.
                 IsInRecognitionSession = true;
-
-
-
 #if VERBOSE_DEBUG
                 Debug.WriteLine( "SpeechManager: Continuous recognition session started" );
 #endif
@@ -189,16 +211,20 @@ namespace FamilyNotes
 
                 messageDialog.Commands.Add(new UICommand("Go to settings...", async (command) =>
                 {
-                    bool result = await Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-microphone"));
+                    bool result = await Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-speech"));
 
                 }));
                 messageDialog.Commands.Add(new UICommand("Close", (command) => { }));
                 await messageDialog.ShowAsync();
+
+                Mutex.Release();
+                return false;
             }
             finally
             {
                 Mutex.Release();
             }
+            return true;
         }
 
         /// <summary>
@@ -221,6 +247,7 @@ namespace FamilyNotes
         {
             if (!String.IsNullOrEmpty(phrase))
             {
+                var previousMode = RecognitionMode;
                 // Turn off speech recognition while speech synthesis is happening.
                 await SetRecognitionMode(SpeechRecognitionMode.Paused);
 
@@ -237,9 +264,10 @@ namespace FamilyNotes
                 // before turning on speech recognition again. The semaphore
                 // is signaled in the mediaElement_MediaEnded event handler.
                 await Semaphore.WaitAsync();
-                
+
                 // Turn on speech recognition and listen for commands.
-                await SetRecognitionMode(SpeechRecognitionMode.CommandPhrases);
+                //await SetRecognitionMode(SpeechRecognitionMode.CommandPhrases);
+                await SetRecognitionMode(previousMode);
             }
         }
 
@@ -266,9 +294,21 @@ namespace FamilyNotes
             StateChanged?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// Raised when the state of the <see cref="Windows.Media.SpeechRecognition.SpeechRecognizer"/> changes.
+        /// </summary>
+        /// <remarks>The handler for the <see cref="SpeechRecognizer.StateChanged"/> event 
+        /// raises this event.</remarks>
+        public event EventHandler<EventArgs> ModeChanged;
+        public delegate void ModeChangedEventHandler(object sender, EventArgs e);
+        protected virtual void OnModeChanged(EventArgs e)
+        {
+            ModeChanged?.Invoke(this, e);
+        }
+
         #region Implementation for speech recognition
 
-        private bool IsInRecognitionSession { get; set; }
+        public bool IsInRecognitionSession { get; set; }
 
         /// <summary>
         /// Queries a <see cref="MediaCapture"/> instance for an audio device controller. 
@@ -310,12 +350,14 @@ namespace FamilyNotes
             return isMicrophoneAvailable;
         }
 
-
         private async void Family_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            // Re-compile the grammar for family members and
-            // restart the recognition session.
-            await StartContinuousRecognition();
+            // Re-compile the grammar for family members and restart the recognition
+            // session, but only if voice recognition is already active.
+            if (IsInRecognitionSession)
+            {
+                await StartContinuousRecognition();
+            }
         }
 
         private SpeechRecognizer SpeechRecognizer
